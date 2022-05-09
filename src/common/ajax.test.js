@@ -1,7 +1,7 @@
 /* eslint-disable testing-library/await-async-utils */
 import moxios from "moxios";
 
-import { ajaxBase, GET } from "./ajax";
+import { ajaxBase, encodeQueryData, GET } from "./ajax";
 
 describe('ajax', () => {
     beforeEach(() => {
@@ -24,5 +24,13 @@ describe('ajax', () => {
 
         const resp = await ajaxBase('http://localhost:5000/dir/list', GET)
         expect(resp.data).toEqual(data);
+    })
+
+    it('should return URL encoded string', () => {
+        const data = {
+            'key1': 'value1',
+            'key2': 'value2'
+        }
+        expect(encodeQueryData(data)).toEqual('key1=value1&key2=value2')
     })
 })

@@ -7,7 +7,7 @@ export const DELETE = 'delete' as const;
 
 type RequestMethod = typeof GET | typeof POST | typeof PUT | typeof DELETE
 
-export const ajaxBase = async <T>(url: string, method?: RequestMethod, data?: T, header?: AxiosRequestHeaders) => {
+export const ajaxBase = <T>(url: string, method?: RequestMethod, data?: T, header?: AxiosRequestHeaders) => {
     var params = undefined;
     if (method === GET) {
         params = data;
@@ -21,6 +21,12 @@ export const ajaxBase = async <T>(url: string, method?: RequestMethod, data?: T,
         headers: header
     }
     console.log('.. ajax request : ', config)
-    return await axios(config);
+    return axios(config);
 }
 
+export const encodeQueryData = (data: { [k: string]: string }) => {
+    const ret = [];
+    for (let k in data)
+        ret.push(encodeURIComponent(k) + '=' + encodeURIComponent('' + data[k]));
+    return ret.join('&');
+}

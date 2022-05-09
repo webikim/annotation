@@ -12,7 +12,7 @@ type SelectDirProps = {
     dir_list: any
 }
 
-const onChangeHandle = (props : SelectDirProps) => (e : React.ChangeEvent<HTMLSelectElement>) => {
+const onChangeHandle = (props: SelectDirProps) => (e : React.ChangeEvent<HTMLSelectElement>) => {
     props.dir_set(e.target.value, parseInt(props.cookies.get(e.target.value)));
     e.target.blur();
 }

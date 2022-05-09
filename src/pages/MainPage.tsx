@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useRef } from 'react';
+import { Row, Col } from 'react-bootstrap';
 import { Cookies } from 'react-cookie';
 import { connect } from 'react-redux';
+import AnnotateImage from '../components/AnnotateImage';
 
 import SelectDir from '../components/SelectDir'
 import { RootState } from '../store/store';
@@ -10,8 +12,24 @@ type MainPageProps = {
 }
 
 const MainPage = (props : MainPageProps) => {
+    const imgRef = useRef();
+    var right = (<></>);
     return (
-        <SelectDir cookies={ props.cookies }></SelectDir>
+        <div>
+            <Row>
+                <SelectDir cookies={ props.cookies }></SelectDir>
+            </Row>
+            <hr></hr>
+            <Row>
+                <Col>
+                    <AnnotateImage imgRef={ imgRef }></AnnotateImage>
+                    <p></p>
+                </Col>
+                <Col>
+                    { right }
+                </Col>
+            </Row>
+        </div>
     )
 }
 

@@ -5,9 +5,8 @@ import { fireEvent, render, screen } from '@testing-library/react'
 import configureStore from 'redux-mock-store'
 
 import SelectDir from './SelectDir'
-import { AnyAction, Dispatch, Middleware } from 'redux';
 
-const middleware: Middleware<{}, any, Dispatch<AnyAction>>[] | undefined = [thunk]
+const middleware = [thunk]
 const mockStore = configureStore(middleware);
 
 describe('selectDir component', () => {
