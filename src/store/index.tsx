@@ -1,9 +1,13 @@
 import { combineReducers } from '@reduxjs/toolkit';
 
-import dirDuck from './modules/dirDuck'
+import annoDuck from './modules/annoDuck';
+import dirDuck from './modules/dirDuck';
 
 const rootReducer = combineReducers(
-    { dir: dirDuck }
+    {
+        anno: annoDuck,
+        dir: dirDuck
+    }
 )
 
 export default rootReducer;

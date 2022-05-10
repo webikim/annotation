@@ -20,7 +20,7 @@ export const ajaxBase = <T>(url: string, method?: RequestMethod, data?: T, heade
         params: params,
         headers: header
     }
-    console.log('.. ajax request : ', config)
+    // console.log('.. ajax request : ', config)
     return axios(config);
 }
 
