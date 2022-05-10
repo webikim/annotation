@@ -1,3 +1,4 @@
+import { Reducer } from "redux";
 import { ajaxBase, GET } from "../../common/ajax";
 import { AppDispatch } from "../store";
 
@@ -19,9 +20,9 @@ const _dir_list = (data: string[]) => ({
     payload: data
 })
 
-export const dir_set = (dir_name: string, pos: number) => {
+export const dir_set = (dir_name: string) => {
     return (dispatch: AppDispatch, getState: any) => {
-        dispatch(file_list(dir_name, pos));
+        dispatch(file_list(dir_name));
         dispatch(_dir_set(dir_name));
     };
 };
@@ -31,7 +32,7 @@ export const _dir_set = (dir_name: string) => ({
     payload: dir_name,
 });
 
-export const file_list = (dir_name: string, pos: number) => async (dispatch: AppDispatch, getState: any) => {
+export const file_list = (dir_name: string) => async (dispatch: AppDispatch, getState: any) => {
     return ajaxBase('/file/list', GET, {'path': encodeURI(dir_name)}).then(
         (response) => dispatch(_file_list(response.data))
     );
@@ -57,35 +58,42 @@ export const _file_set = (filename: string, pos: number) => ({
 })
 
 export type DirAction = ReturnType<typeof _dir_list>
-        | ReturnType<typeof _dir_set>
-        | ReturnType<typeof _file_list>
-        | ReturnType<typeof _file_set>
+    | ReturnType<typeof _dir_set>
+    | ReturnType<typeof _file_list>
+    | ReturnType<typeof _file_set>
+
+export type DirState = {
+    dirs?: string[],
+    cur_dir?: string,
+    files?: string[],
+    cur_file?: number
+}
 
 // reducer
-const INITIAL_STATE = {};
+const INITIAL_STATE: DirState = {};
 
-const reducer = (state: {} = INITIAL_STATE, action: DirAction) => {
+const reducer: Reducer<DirState, DirAction> = (state: DirState = INITIAL_STATE, action: DirAction) => {
     switch (action.type) {
         case DIR_LIST:
             return {
                 ...state,
                 dirs: action.payload,
-            };
+            } as DirState
         case DIR_SET:
             return {
                 ...state,
                 cur_dir: action.payload,
-            };
+            } as DirState
         case FILE_LIST:
             return {
                 ...state,
                 files: action.payload
-            }
+            } as DirState
         case FILE_SET:
             return {
                 ...state,
                 cur_file: action.payload
-            }
+            } as DirState
         default:
             return state;
     }

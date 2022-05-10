@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import AnnotateImage from '../components/AnnotateImage';
 
 import SelectDir from '../components/SelectDir'
-import { RootState } from '../store/store';
+import { RootState } from '../store';
 
 type MainPageProps = {
     cookies: Cookies

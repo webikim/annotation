@@ -2,20 +2,26 @@ import React from 'react'
 import thunk from 'redux-thunk'
 
 import { fireEvent, render, screen } from '@testing-library/react'
-import configureStore from 'redux-mock-store'
+import configureMockStore from 'redux-mock-store'
 
 import SelectDir from './SelectDir'
 
 const middleware = [thunk]
-const mockStore = configureStore(middleware);
+const mockStore = configureMockStore(middleware);
 
 describe('selectDir component', () => {
     let store;
 
     beforeEach(() => {
+        store = mockStore({
+            dir: {
+                dirs: ['testdir']
+            }
+        })
     });
 
     afterEach(() => {
+
     })
 
     it('should dispatch dir_list if dirs === undefined', () => {
@@ -23,7 +29,7 @@ describe('selectDir component', () => {
             dir: {
             }
         });
-        store.dispatch = jest.fn()  // not to call actual ajax
+        store.dispatch = jest.fn()
         render(
             <SelectDir cookies={undefined} store={store}/>
         )
@@ -31,11 +37,6 @@ describe('selectDir component', () => {
     })
 
     it('should render SelectDir', () => {
-        store = mockStore({
-            dir: {
-                dirs: ['testdir']
-            }
-        });
         render(
             <SelectDir cookies={undefined} store={store}/>
         )
@@ -50,11 +51,6 @@ describe('selectDir component', () => {
     });
 
     it('should diaptch dir_set if select change', () => {
-        store = mockStore({
-            dir: {
-                dirs: ['testdir']
-            }
-        });
         let cookies = {
             get: jest.fn()
         }
@@ -64,9 +60,9 @@ describe('selectDir component', () => {
         )
         fireEvent.change(screen.getByTestId('select'), { target: { value: 'testdir' }});
         expect(cookies.get).toHaveBeenCalledWith('testdir')
-        expect(store.dispatch).toHaveBeenCalledTimes(1)
+        expect(store.dispatch).toHaveBeenCalledTimes(2)
 
-        // without store.dispatch = jest.fn().
+        // without store.dispatch = jest.fn(). call actual ajax
         // const actions = store.getActions();
         // expect(actions[0]).toEqual({ type: 'dir/set', payload: 'testdir' })
     })

@@ -1,19 +1,33 @@
-import React, { Children } from 'react'
-import { connect } from 'react-redux'
+import React, { ChangeEvent, Children } from 'react'
+import { connect, ConnectedProps } from 'react-redux'
 import { Col, Row } from 'react-bootstrap';
 import { BsFolder2Open } from "react-icons/bs";
 
-import { dir_list, dir_set } from '../store/modules/dirDuck';
+import { dir_list, dir_set, file_setpos } from '../store/modules/dirDuck';
+import { RootState } from '../store';
 
-type SelectDirProps = {
-    dirs: any,
-    cookies: any,
-    dir_set: any,
-    dir_list: any
+const mapStateToProps = (state : RootState) => {
+    return {
+        dirs: state.dir.dirs
+    }
 }
 
-const onChangeHandle = (props: SelectDirProps) => (e : React.ChangeEvent<HTMLSelectElement>) => {
-    props.dir_set(e.target.value, parseInt(props.cookies.get(e.target.value)));
+const mapDispatchToProps = {
+        dir_list,
+        dir_set,
+        file_setpos 
+}
+
+const connector = connect(mapStateToProps, mapDispatchToProps);
+type PropsFromRedux = ConnectedProps<typeof connector>
+
+interface SelectDirProps extends PropsFromRedux {
+    cookies: any
+}
+ 
+const onChangeHandle = ({ dir_set, file_setpos, cookies }: SelectDirProps) => (e : ChangeEvent<HTMLSelectElement>) => {
+    dir_set(e.target.value);
+    file_setpos(parseInt(cookies.get(e.target.value) || 0));
     e.target.blur();
 }
 
@@ -44,11 +58,5 @@ const SelectDir = (props: SelectDirProps) => {
         </Row>
     );
 }
-
-const mapStateToProps = (state : any) => {
-    return {
-        dirs: state.dir.dirs
-    }
-}
-
-export default connect(mapStateToProps, { dir_list, dir_set })(SelectDir)
+   
+export default connector(SelectDir);
