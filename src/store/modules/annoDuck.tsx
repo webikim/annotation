@@ -1,5 +1,5 @@
 import { Reducer } from "redux";
-import { RootState } from "..";
+import { GetState } from "..";
 import { AppDispatch } from "../store";
 
 export const mark_set: { [k: string]: string[] } = {
@@ -15,14 +15,22 @@ export const color_set: { [k: string]: string[] } = {
     'hem': ['r', 'deepskyblue', 'orange']
 }
 
-const get_color_key = (colorSet: typeof color_set) => Object.keys(color_set).map(each => color_set[each][0]);
+export const color_key = Object.keys(color_set).map(each => color_set[each][0]);
 
-export const color_key = get_color_key(color_set);
+type Landmark = {
+    [k: number]: {
+        x: number,
+        y: number
+    }[]
+};
+
+type NumberUndefined = number | undefined;
 
 // action type
 export const CLOTH_TYPE_SET = 'cloth/type/set' as const;
 export const LANDMARK_ORDER_SET = 'cloth/color/set' as const;
 export const LANDMARK_ORDER_CLEAR = 'cloth/color/clear' as const;
+export const LANDMARK_SET = 'cloth/landmark/set' as const;
 export const LANDMARK_CLEAR = 'cloth/landmark/clear' as const;
 export const CLOTH_VARIED_SET = 'cloth/varied/set' as const;
 
@@ -39,7 +47,7 @@ export const _cloth_type_set = (cloth_type: string) => ({
 })
 
 export const landmark_order_set = (landmark_order: number) => {
-    return (dispatch: AppDispatch, getState: ()=>RootState) => {
+    return (dispatch: AppDispatch, getState: GetState) => {
         const cloth_type = getState().anno.cloth_type;
         if (cloth_type) {
             const color_index = mark_set[cloth_type].map(each => color_set[each][0]).indexOf(color_key[landmark_order]);
@@ -55,7 +63,7 @@ export const _landmark_order_set = (landmark_order: number) => ({
 })
 
 export const landmark_order_clear = (order: number) => {
-    return (dispatch: AppDispatch, getState: ()=>RootState) => {
+    return (dispatch: AppDispatch, getState: GetState) => {
         const { anno } = getState();
         let marks = { ...anno.marks }
         delete marks[order];
@@ -66,6 +74,58 @@ export const landmark_order_clear = (order: number) => {
 export const _landmark_order_clear = (marks: object) => ({
     type: LANDMARK_ORDER_CLEAR,
     payload: marks
+})
+
+export const landmark_set = (order: NumberUndefined, vis_type: number, x: number, y: number) => {
+    return (dispatch: AppDispatch, getState: GetState) => {
+        if (order !== undefined) {
+            const { anno } = getState();
+            if (Object.keys(anno).indexOf('marks') >= 0) {
+                let landmark_in_order = {...anno!.marks![order]};
+                if (Object.keys(landmark_in_order) !== undefined && Object.keys(landmark_in_order).length > 0)  {
+                    let landmark = landmark_in_order[vis_type === 1 ? 0: 1]
+                    if ((landmark && landmark.length > 1) || (landmark && landmark_in_order[vis_type]))
+                        landmark_in_order[vis_type === 1 ? 0: 1] = landmark.slice(1);
+                }
+                if (Object.keys(landmark_in_order).indexOf(String(vis_type)) > -1) {
+                    let landmark = landmark_in_order[vis_type]
+                    if (landmark_in_order[vis_type].length > 1)
+                        landmark_in_order[vis_type] = landmark.slice(1);
+                    landmark_in_order[vis_type] = landmark_in_order[vis_type].concat({
+                        x: x,
+                        y: y
+                    })
+                } else {
+                    landmark_in_order = {
+                        ...landmark_in_order,
+                        [vis_type]: [{
+                            x: x,
+                            y: y
+                        }]
+                    }
+                }
+                dispatch(_landmark_set({
+                    order: order,
+                    vis_type: landmark_in_order
+                }))
+            } else {
+                dispatch(_landmark_set({
+                    order: order,
+                    vis_type: {
+                        [vis_type]: [{
+                            x: x,
+                            y: y
+                        }]
+                    }
+                }));
+            }
+        }
+    }
+}
+
+export const _landmark_set = (landmark: { order: number, vis_type: object }) => ({
+    type: LANDMARK_SET,
+    payload: landmark
 })
 
 export const landmark_clear = () => ({
@@ -80,13 +140,14 @@ export const cloth_varied_set = (cloth_varied: number) => ({
 export type AnnoAction = ReturnType<typeof _cloth_type_set>
     | ReturnType<typeof _landmark_order_set>
     | ReturnType<typeof _landmark_order_clear>
+    | ReturnType<typeof _landmark_set>
     | ReturnType<typeof landmark_clear>
     | ReturnType<typeof cloth_varied_set>
 
 export type AnnoState = {
     cloth_type?: string,
     landmark_order?: number,
-    marks?: { [k: number]: object },
+    marks?: { [k: number]: Landmark },
     cloth_varied?: number
 }
 
@@ -118,7 +179,15 @@ const reducer: Reducer<AnnoState, AnnoAction> = (state: AnnoState = INITIAL_STAT
             return {
                 ...state,
                 cloth_varied: action.payload
-            }
+            } as AnnoState
+        case LANDMARK_SET:
+            return {
+                ...state,
+                marks: {
+                    ...state.marks,
+                    [action.payload.order]: action.payload.vis_type
+                }
+            } as AnnoState
         default:
             return state;
     }

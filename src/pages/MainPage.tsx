@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { Row, Col } from 'react-bootstrap';
 import { Cookies } from 'react-cookie';
 import { BsStopFill } from 'react-icons/bs';
@@ -10,6 +10,7 @@ import ClothVaried from '../components/ClothVaried';
 import Landmark from '../components/Landmark';
 import SelectDir from '../components/SelectDir'
 
+import { image_setpos } from '../store/modules/imageDuck';
 import { RootState } from '../store';
 
 const mapStateToProps = (state: RootState) => {
@@ -19,7 +20,7 @@ const mapStateToProps = (state: RootState) => {
 }
 
 const mapDispatchToProps = {
-
+    image_setpos
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -31,6 +32,12 @@ interface MainPageProps extends PropsFromRedux {
 
 const MainPage = (props : MainPageProps) => {
     const imgRef = useRef();
+    useEffect(() => {
+        if (imgRef.current) {
+            const bbox = (imgRef.current as HTMLImageElement).getBoundingClientRect();
+            props.image_setpos(bbox.top, bbox.left);
+        }
+    })
     var right = (<></>);
     if (props.cur_dir)
         right = (

@@ -1,6 +1,6 @@
 import createMockStore from "redux-mock-store"
 import thunk from "redux-thunk";
-import { cloth_type_set, cloth_varied_set, landmark_order_clear, landmark_order_set } from "./annoDuck";
+import { cloth_type_set, cloth_varied_set, landmark_order_clear, landmark_order_set, landmark_set } from "./annoDuck";
 
 const middleware = [thunk];
 const mockStore = createMockStore(middleware);
@@ -58,5 +58,13 @@ describe('annoDuck', () => {
         const action = store.getActions();
         const expected = { type: 'cloth/varied/set', payload: 0 }
         expect(action).toEqual([expected])
+    })
+
+    it('should set landmark', () => {
+        store = mockStore(initialstate);
+        store.dispatch(landmark_set(0, 0, 12, 23));
+        const action = store.getActions();
+        const expected = {"payload": {"order": 0, "vis_type": {"0": [{"x": 12, "y": 23}]}}, "type": "cloth/landmark/set"}
+        expect(action).toEqual([expected]);
     })
 })

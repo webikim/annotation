@@ -1,4 +1,5 @@
 import { Reducer } from "redux";
+import { GetState } from "..";
 import { ajaxBase, GET } from "../../common/ajax";
 import { AppDispatch } from "../store";
 
@@ -9,7 +10,7 @@ export const FILE_LIST = "file/list" as const;
 export const FILE_SET = 'file/set';
 
 // action
-export const dir_list = () => async (dispatch: AppDispatch, getState: any) => {
+export const dir_list = () => async (dispatch: AppDispatch) => {
     return ajaxBase("/dir/list", GET).then(
         (response) => dispatch(_dir_list(response.data))
     );
@@ -21,7 +22,7 @@ const _dir_list = (data: string[]) => ({
 })
 
 export const dir_set = (dir_name: string) => {
-    return (dispatch: AppDispatch, getState: any) => {
+    return (dispatch: AppDispatch) => {
         dispatch(file_list(dir_name));
         dispatch(_dir_set(dir_name));
     };
@@ -32,7 +33,7 @@ export const _dir_set = (dir_name: string) => ({
     payload: dir_name,
 });
 
-export const file_list = (dir_name: string) => async (dispatch: AppDispatch, getState: any) => {
+export const file_list = (dir_name: string) => async (dispatch: AppDispatch) => {
     return ajaxBase('/file/list', GET, {'path': encodeURI(dir_name)}).then(
         (response) => dispatch(_file_list(response.data))
     );
@@ -44,10 +45,10 @@ export const _file_list = (data: any[]) => ({
 })
 
 export const file_setpos = (pos: number) => {
-    return ((dispatch: AppDispatch, getState: any) => {
+    return ((dispatch: AppDispatch, getState: GetState) => {
         const { dir } = getState()
         if ('files' in dir) {
-            dispatch(_file_set(dir['files'][pos], pos));
+            dispatch(_file_set(dir['files']![pos], pos));
         }
     })
 }
