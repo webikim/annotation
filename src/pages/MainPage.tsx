@@ -5,6 +5,7 @@ import { BsStopFill } from 'react-icons/bs';
 import { connect, ConnectedProps } from 'react-redux';
 import AnnotateImage from '../components/AnnotateImage';
 import ClothType from '../components/ClothType';
+import Landmark from '../components/Landmark';
 
 import SelectDir from '../components/SelectDir'
 import { RootState } from '../store';
@@ -37,6 +38,12 @@ const MainPage = (props : MainPageProps) => {
                     <span><BsStopFill></BsStopFill> 옷 종류(Cloth type)</span>
                     <hr></hr>
                     <ClothType></ClothType>
+                </Row>
+                <p></p>
+                <Row>
+                    <span><BsStopFill></BsStopFill> 랜드마크 (Landmark)</span>
+                    <hr></hr>
+                    <Landmark></Landmark>
                 </Row>
             </>
         )
