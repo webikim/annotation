@@ -30,4 +30,12 @@ describe('Landmark', () => {
         )
         expect(screen.getByText(/collar/i)).toBeInTheDocument()
     })
+
+    it('should change color (type of landmark to mark color)', () => {
+
+    })
+
+    it('should clear color', () => {
+
+    })
 })

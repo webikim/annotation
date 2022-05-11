@@ -3,11 +3,13 @@ import { Row, Col } from 'react-bootstrap';
 import { Cookies } from 'react-cookie';
 import { BsStopFill } from 'react-icons/bs';
 import { connect, ConnectedProps } from 'react-redux';
+
 import AnnotateImage from '../components/AnnotateImage';
 import ClothType from '../components/ClothType';
+import ClothVaried from '../components/ClothVaried';
 import Landmark from '../components/Landmark';
-
 import SelectDir from '../components/SelectDir'
+
 import { RootState } from '../store';
 
 const mapStateToProps = (state: RootState) => {
@@ -44,6 +46,12 @@ const MainPage = (props : MainPageProps) => {
                     <span><BsStopFill></BsStopFill> 랜드마크 (Landmark)</span>
                     <hr></hr>
                     <Landmark></Landmark>
+                </Row>
+                <p></p>
+                <Row>
+                    <span><BsStopFill></BsStopFill> 자세 변형 정도</span>
+                    <hr></hr>
+                    <ClothVaried></ClothVaried>
                 </Row>
             </>
         )

@@ -1,17 +1,18 @@
 import createMockStore from "redux-mock-store"
 import thunk from "redux-thunk";
-import { cloth_type_set, landmark_clear, landmark_order_clear, landmark_order_set } from "./annoDuck";
+import { cloth_type_set, cloth_varied_set, landmark_order_clear, landmark_order_set } from "./annoDuck";
 
 const middleware = [thunk];
 const mockStore = createMockStore(middleware);
+const initialstate = {
+            anno: { }
+        }
 
 describe('annoDuck', () => {
     let store;
 
     beforeAll(() => {
-        store = mockStore({
-            anno: { }
-        });
+        store = mockStore(initialstate);
     })
 
     it('should set cloth type', () => {
@@ -21,7 +22,7 @@ describe('annoDuck', () => {
         expect(action).toEqual([expected]);
     })
 
-    it('should set landmark_order', () => {
+    it('should set landmark_order (landmark type to mark color)', () => {
         const beforestate = {
             anno: {
                 cloth_type: "upper"
@@ -34,7 +35,7 @@ describe('annoDuck', () => {
         expect(action).toEqual([expected]);
     })
 
-    it('should clear landmark_order', () => {
+    it('should clear landmark_order (landmark type to mark color)', () => {
         const beforestate = {
             anno: {
                 marks: {
@@ -44,10 +45,18 @@ describe('annoDuck', () => {
         } 
         store = mockStore(beforestate);
         const state = store.getState();
-        expect(state).toEqual(beforestate)
+        expect(state).toEqual(beforestate);
         store.dispatch(landmark_order_clear(0));
         const action = store.getActions();
-        const expected = { type: 'cloth/color/clear', payload: {} }
+        const expected = { type: 'cloth/color/clear', payload: {} };
         expect(action).toEqual([expected]);
+    })
+
+    it('should change cloth_varied', () => {
+        store = mockStore(initialstate);
+        store.dispatch(cloth_varied_set(0));
+        const action = store.getActions();
+        const expected = { type: 'cloth/varied/set', payload: 0 }
+        expect(action).toEqual([expected])
     })
 })

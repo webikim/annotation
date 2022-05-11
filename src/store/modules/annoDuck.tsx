@@ -24,6 +24,7 @@ export const CLOTH_TYPE_SET = 'cloth/type/set' as const;
 export const LANDMARK_ORDER_SET = 'cloth/color/set' as const;
 export const LANDMARK_ORDER_CLEAR = 'cloth/color/clear' as const;
 export const LANDMARK_CLEAR = 'cloth/landmark/clear' as const;
+export const CLOTH_VARIED_SET = 'cloth/varied/set' as const;
 
 // action
 export const cloth_type_set = (cloth_type: string) => {
@@ -71,15 +72,22 @@ export const landmark_clear = () => ({
     type: LANDMARK_CLEAR
 })
 
+export const cloth_varied_set = (cloth_varied: number) => ({
+    type: CLOTH_VARIED_SET,
+    payload: cloth_varied
+})
+
 export type AnnoAction = ReturnType<typeof _cloth_type_set>
     | ReturnType<typeof _landmark_order_set>
     | ReturnType<typeof _landmark_order_clear>
     | ReturnType<typeof landmark_clear>
+    | ReturnType<typeof cloth_varied_set>
 
 export type AnnoState = {
     cloth_type?: string,
     landmark_order?: number,
-    marks?: { [k: number]: object }
+    marks?: { [k: number]: object },
+    cloth_varied?: number
 }
 
 const INITIAL_STATE: AnnoState = {}
@@ -106,6 +114,11 @@ const reducer: Reducer<AnnoState, AnnoAction> = (state: AnnoState = INITIAL_STAT
                 ...state,
                 marks: {}
             } as AnnoState
+        case CLOTH_VARIED_SET:
+            return {
+                ...state,
+                cloth_varied: action.payload
+            }
         default:
             return state;
     }
