@@ -4,7 +4,6 @@ import { Col, Row } from 'react-bootstrap';
 import { BsFolder2Open } from "react-icons/bs";
 
 import { dir_list, dir_set, file_setpos } from '../store/modules/dirDuck';
-import { RootState } from '../store';
 
 const mapStateToProps = (state : RootState) => {
     return {
@@ -39,7 +38,7 @@ const SelectDir = (props: SelectDirProps) => {
     }
     let dir_elem = [];
     dir_elem.push(
-        <option data-testid='select-option' value='.'>./ (현재위치)</option>
+        <option data-testid='select-option' value='.'>./</option>
     )
     for (let i in dirs)
         dir_elem.push(
@@ -48,7 +47,7 @@ const SelectDir = (props: SelectDirProps) => {
     return (
         <Row style={{ marginTop: '10px' }}>
             <Col sm={2}>
-                <span style={{ fontWeight: 700 }}><BsFolder2Open></BsFolder2Open>&nbsp; 랜드마크 작업 위치 </span>
+                <span style={{ fontWeight: 700 }}><BsFolder2Open></BsFolder2Open>&nbsp; 작업 위치 (Location)</span>
             </Col>
             <Col sm={10}>
                 <select style={{ width: '100%'}} onChange={ onChangeHandle(props) } data-testid='select'>

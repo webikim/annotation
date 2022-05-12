@@ -11,7 +11,6 @@ import Landmark from '../components/Landmark';
 import SelectDir from '../components/SelectDir'
 
 import { image_setpos } from '../store/modules/imageDuck';
-import { RootState } from '../store';
 
 const mapStateToProps = (state: RootState) => {
     return {
@@ -44,7 +43,7 @@ const MainPage = (props : MainPageProps) => {
             <>
                 <p></p>
                 <Row>
-                    <span><BsStopFill></BsStopFill> 옷 종류(Cloth type)</span>
+                    <span><BsStopFill></BsStopFill> 옷 종류 (Cloth type)</span>
                     <hr></hr>
                     <ClothType></ClothType>
                 </Row>
@@ -56,7 +55,7 @@ const MainPage = (props : MainPageProps) => {
                 </Row>
                 <p></p>
                 <Row>
-                    <span><BsStopFill></BsStopFill> 자세 변형 정도</span>
+                    <span><BsStopFill></BsStopFill> 자세 변형 정도 (Variation)</span>
                     <hr></hr>
                     <ClothVaried></ClothVaried>
                 </Row>

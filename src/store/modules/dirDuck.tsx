@@ -1,7 +1,5 @@
 import { Reducer } from "redux";
-import { GetState } from "..";
 import { ajaxBase, GET } from "../../common/ajax";
-import { AppDispatch } from "../store";
 
 // action type
 export const DIR_LIST = "dir/list" as const;

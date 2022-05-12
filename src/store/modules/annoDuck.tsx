@@ -1,6 +1,4 @@
 import { Reducer } from "redux";
-import { GetState } from "..";
-import { AppDispatch } from "../store";
 
 export const mark_set: { [k: string]: string[] } = {
     'upper': ['collar', 'sleeve', 'hem'],
@@ -24,8 +22,6 @@ type Landmark = {
     }[]
 };
 
-type NumberUndefined = number | undefined;
-
 // action type
 export const CLOTH_TYPE_SET = 'cloth/type/set' as const;
 export const LANDMARK_ORDER_SET = 'cloth/color/set' as const;
@@ -33,6 +29,9 @@ export const LANDMARK_ORDER_CLEAR = 'cloth/color/clear' as const;
 export const LANDMARK_SET = 'cloth/landmark/set' as const;
 export const LANDMARK_CLEAR = 'cloth/landmark/clear' as const;
 export const CLOTH_VARIED_SET = 'cloth/varied/set' as const;
+export const BBOX_SET = 'bbox/set' as const;
+export const BBOX_SHOW_SET = 'bbox/show/set' as const;
+export const BBOX_UPDATE_SET = 'bbox/update/set' as const;
 
 // action
 export const cloth_type_set = (cloth_type: string) => {
@@ -137,18 +136,39 @@ export const cloth_varied_set = (cloth_varied: number) => ({
     payload: cloth_varied
 })
 
+export const bbox_set = (bbox: object) => ({
+    type: BBOX_SET,
+    payload: bbox
+})
+
+export const bbox_show_set = (value: number) => ({
+    type: BBOX_SHOW_SET,
+    payload: value
+})
+
+export const bbox_update_set = (value: number) => ({
+    type: BBOX_UPDATE_SET,
+    payload: value
+})
+
 export type AnnoAction = ReturnType<typeof _cloth_type_set>
     | ReturnType<typeof _landmark_order_set>
     | ReturnType<typeof _landmark_order_clear>
     | ReturnType<typeof _landmark_set>
     | ReturnType<typeof landmark_clear>
     | ReturnType<typeof cloth_varied_set>
+    | ReturnType<typeof bbox_set>
+    | ReturnType<typeof bbox_show_set>
+    | ReturnType<typeof bbox_update_set>
 
 export type AnnoState = {
     cloth_type?: string,
     landmark_order?: number,
     marks?: { [k: number]: Landmark },
-    cloth_varied?: number
+    cloth_varied?: number,
+    bbox?: object,
+    bbox_show?: number,
+    bbox_update?: number
 }
 
 const INITIAL_STATE: AnnoState = {}

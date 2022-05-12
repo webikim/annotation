@@ -3,7 +3,6 @@ import { connect, ConnectedProps } from 'react-redux'
 import { Row, Col } from 'react-bootstrap';
 
 import { cloth_type_set } from '../store/modules/annoDuck';
-import { RootState } from '../store';
 
 const mapStateToProps = (state: RootState) => {
     return {
@@ -30,15 +29,15 @@ const ClothType = (props: ClothTypeProps) => {
     return (
         <Row md={4}>
             <Col>
-                <input type="radio" name="cloth_type" value="upper" checked={ props.cloth_type == 'upper' } onChange={ onChangeCloth(props)} />
+                <input type="radio" name="cloth_type" value="upper" checked={ props.cloth_type === 'upper' } onChange={ onChangeCloth(props)} />
                 <label>&nbsp;1. 상의</label>
             </Col>
             <Col>
-                <input type="radio" name="cloth_type" value="lower" checked={ props.cloth_type == 'lower' } onChange={ onChangeCloth(props)}  />
+                <input type="radio" name="cloth_type" value="lower" checked={ props.cloth_type === 'lower' } onChange={ onChangeCloth(props)}  />
                 <label>&nbsp;2. 하의</label>
             </Col>
             <Col>
-                <input type="radio" name="cloth_type" value="full" checked={ props.cloth_type == 'full' } onChange={ onChangeCloth(props)}  />
+                <input type="radio" name="cloth_type" value="full" checked={ props.cloth_type === 'full' } onChange={ onChangeCloth(props)}  />
                 <label>&nbsp;3. 전체</label>
             </Col>
         </Row>

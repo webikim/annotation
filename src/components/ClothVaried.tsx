@@ -3,7 +3,6 @@ import { connect, ConnectedProps } from 'react-redux';
 import { Row, Col } from 'react-bootstrap';
 
 import { cloth_varied_set } from '../store/modules/annoDuck';
-import { RootState } from '../store';
 
 const mapStateToProps = (state: RootState) => {
     return {

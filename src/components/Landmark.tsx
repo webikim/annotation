@@ -5,8 +5,6 @@ import { BsXCircleFill } from "react-icons/bs";
 
 import { mark_set, color_set, color_key, landmark_order_set, landmark_order_clear, landmark_clear } from '../store/modules/annoDuck';
 
-import { RootState } from '../store';
-
 const mapStateToProps = (state: RootState) => {
     return {
         cloth_type: state.anno.cloth_type,

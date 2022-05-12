@@ -3,7 +3,6 @@ import { BsFillFileEarmarkFill } from "react-icons/bs";
 import { connect, ConnectedProps } from 'react-redux'
 
 import { encodeQueryData } from '../common/ajax';
-import { RootState } from '../store';
 import { color_set, landmark_set } from '../store/modules/annoDuck';
 import { file_setpos } from '../store/modules/dirDuck';
 
@@ -106,7 +105,7 @@ const AnnotateImage = (props: AnnotateImageProp) => {
         const file = props.files[props.cur_file];
         return (
             <>
-                <p style={{ fontWeight: 700 }}><BsFillFileEarmarkFill></BsFillFileEarmarkFill> 파일명 :&nbsp; 
+                <p style={{ fontWeight: 700 }}><BsFillFileEarmarkFill></BsFillFileEarmarkFill> 파일명 (filename) :&nbsp; 
                     <input style={{ border: '2px solid #ced4da', padding: '1px 2px', borderRadius: '3px' }}
                         type='text' value={file} onClick={onClickSearch(props)} onChange={(e) => { }}></input>
                 </p>
