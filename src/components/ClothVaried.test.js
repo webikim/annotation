@@ -1,6 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import createMockStore from "redux-mock-store"
 import thunk from "redux-thunk";
+import { CLOTH_VARIED_SET } from "../store/modules/annoDuck";
 import ClothVaried from "./ClothVaried";
 
 const middleware = [thunk]
@@ -29,7 +30,9 @@ describe('ClothVaried', () => {
         )
         fireEvent.click(screen.getByDisplayValue(1));
         const action = store.getActions();
-        const expected = { type: 'cloth/varied/set', payload: 1 }
-        expect(action).toEqual([expected])
+        const expected = [
+            { type: CLOTH_VARIED_SET, payload: 1 }
+        ];
+        expect(action).toEqual(expected)
     })
 })

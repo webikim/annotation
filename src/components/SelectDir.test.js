@@ -8,21 +8,18 @@ import SelectDir from './SelectDir'
 
 const middleware = [thunk]
 const mockStore = configureMockStore(middleware);
-
+const initialstate = {
+    dir: {
+        dirs: ['testdir']
+    }
+}
+        
 describe('selectDir component', () => {
     let store;
 
     beforeEach(() => {
-        store = mockStore({
-            dir: {
-                dirs: ['testdir']
-            }
-        })
+        store = mockStore(initialstate)
     });
-
-    afterEach(() => {
-
-    })
 
     it('should dispatch dir_list if dirs === undefined', () => {
         store = mockStore({
@@ -42,8 +39,6 @@ describe('selectDir component', () => {
         )
         const labelElement = screen.getByText(/작업 위치/i)
         expect(labelElement).toBeInTheDocument();
-        const optionElement = screen.getByText(/현재위치/i)
-        expect(optionElement).toBeInTheDocument();
         const testElement = screen.getByText(/testdir/i)
         expect(testElement).toBeInTheDocument();
         let options = screen.getAllByTestId('select-option')

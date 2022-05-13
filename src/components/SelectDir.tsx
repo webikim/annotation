@@ -1,30 +1,30 @@
 import React, { ChangeEvent, Children } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 import { Col, Row } from 'react-bootstrap';
+import { Cookies } from 'react-cookie';
 import { BsFolder2Open } from "react-icons/bs";
 
-import { dir_list, dir_set, file_setpos } from '../store/modules/dirDuck';
+import { dir_list, dir_set, file_set } from '../store/modules/dirDuck';
+import { RootState } from '../store/store';
 
-const mapStateToProps = (state : RootState) => {
-    return {
-        dirs: state.dir.dirs
-    }
-}
+const mapStateToProps = (state : RootState) => ({
+    dirs: state.dir.dirs
+})
 
 const mapDispatchToProps = {
         dir_list,
         dir_set,
-        file_setpos 
+        file_set 
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 interface SelectDirProps extends PropsFromRedux {
-    cookies: any
+    cookies: Cookies
 }
  
-const onChangeHandle = ({ dir_set, file_setpos, cookies }: SelectDirProps) => (e : ChangeEvent<HTMLSelectElement>) => {
+const onChangeHandle = ({ dir_set, file_set: file_setpos, cookies }: SelectDirProps) => (e : ChangeEvent<HTMLSelectElement>) => {
     dir_set(e.target.value);
     file_setpos(parseInt(cookies.get(e.target.value) || 0));
     e.target.blur();
@@ -40,10 +40,11 @@ const SelectDir = (props: SelectDirProps) => {
     dir_elem.push(
         <option data-testid='select-option' value='.'>./</option>
     )
-    for (let i in dirs)
+    dirs.map((each) => 
         dir_elem.push(
-            <option data-testid='select-option' value={dirs[i]}>./{ dirs[i] }</option>
+            <option data-testid='select-option' value={each}>./{ each }</option>
         )
+    )
     return (
         <Row style={{ marginTop: '10px' }}>
             <Col sm={2}>

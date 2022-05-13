@@ -3,12 +3,11 @@ import { connect, ConnectedProps } from 'react-redux';
 import { Row, Col } from 'react-bootstrap';
 
 import { cloth_varied_set } from '../store/modules/annoDuck';
+import { RootState } from '../store/store';
 
-const mapStateToProps = (state: RootState) => {
-    return {
-        cloth_varied: state.anno.cloth_varied
-    }
-}
+const mapStateToProps = (state: RootState) => ({
+    cloth_varied: state.anno.cloth_varied
+})
 
 const mapDispatchToProps = {
    cloth_varied_set 

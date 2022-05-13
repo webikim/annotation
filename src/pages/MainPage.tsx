@@ -9,8 +9,10 @@ import ClothType from '../components/ClothType';
 import ClothVaried from '../components/ClothVaried';
 import Landmark from '../components/Landmark';
 import SelectDir from '../components/SelectDir'
+import ImageNav from '../components/ImageNav'
 
 import { image_setpos } from '../store/modules/imageDuck';
+import { RootState } from '../store/store';
 
 const mapStateToProps = (state: RootState) => {
     return {
@@ -71,6 +73,7 @@ const MainPage = (props : MainPageProps) => {
                 <Col>
                     <AnnotateImage imgRef={ imgRef }></AnnotateImage>
                     <p></p>
+                    <ImageNav cookies={ props.cookies }></ImageNav>
                 </Col>
                 <Col>
                     { right }

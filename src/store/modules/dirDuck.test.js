@@ -2,7 +2,7 @@
 import moxios from "moxios";
 import configureMockStore from 'redux-mock-store'
 import thunk from 'redux-thunk'
-import { dir_list, dir_set, file_list, file_setpos } from "./dirDuck";
+import { DIR_LIST, dir_list, DIR_SET, dir_set, FILE_LIST, file_list, FILE_SET, file_set } from "./dirDuck";
 
 const middleware = [thunk]
 const mockStore = configureMockStore(middleware);
@@ -34,15 +34,19 @@ describe('dirDuck', () => {
 
         await store.dispatch(dir_list());
         const actual = store.getActions();
-        const expected = { type: 'dir/list', payload: [ 'dir1', 'dir2', 'dir3' ] }
-        expect(actual).toEqual([expected]);
+        const expected = [
+            { type: DIR_LIST, payload: ['dir1', 'dir2', 'dir3'] }
+        ];
+        expect(actual).toEqual(expected);
     })
 
     it('should set current dir', () => {
         store.dispatch(dir_set('dir1', 0))
         const actual = store.getActions();
-        const expected = { type: 'dir/set', payload: 'dir1' }
-        expect(actual).toEqual([expected]);
+        const expected = [
+            { type: DIR_SET, payload: 'dir1' }
+        ];
+        expect(actual).toEqual(expected);
     })
 
     it('should get file list', async () => {
@@ -56,12 +60,14 @@ describe('dirDuck', () => {
         })
         await store.dispatch(file_list('dir1'));
         const actual = store.getActions();
-        const expected = { type: 'file/list', payload: [ 'file1', 'file2', 'file3' ] }
-        expect(actual).toEqual([expected])
+        const expected = [
+            { type: FILE_LIST, payload: ['file1', 'file2', 'file3'] }
+        ]
+        expect(actual).toEqual(expected)
     })
 
     it('should not set current file', () => {
-        store.dispatch(file_setpos(0))
+        store.dispatch(file_set(0))
         const actual = store.getActions();
         expect(actual).toEqual([]);
     })
@@ -72,9 +78,12 @@ describe('dirDuck', () => {
                 files: ['file1']
             }
         })
-        store.dispatch(file_setpos(0))
+        store.dispatch(file_set(0))
         const actual = store.getActions();
-        expect(actual).toEqual([{ type: 'file/set', payload: 0 }]);
+        const expected = [
+            { type: FILE_SET, payload: 0 }
+        ]
+        expect(actual).toEqual(expected);
     })
 
 })

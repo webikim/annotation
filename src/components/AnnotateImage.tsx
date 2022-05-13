@@ -4,21 +4,20 @@ import { connect, ConnectedProps } from 'react-redux'
 
 import { encodeQueryData } from '../common/ajax';
 import { color_set, landmark_set } from '../store/modules/annoDuck';
-import { file_setpos } from '../store/modules/dirDuck';
+import { file_set } from '../store/modules/dirDuck';
+import { RootState } from '../store/store';
 
-const mapStateToProps = (state: RootState) => {
-    return {
-        cur_dir: state.dir.cur_dir,
-        cur_file: state.dir.cur_file,
-        files: state.dir.files,
-        landmark_order: state.anno.landmark_order,
-        marks: state.anno.marks,
-        image: state.image.image
-    }
-}
+const mapStateToProps = (state: RootState) => ({
+    cur_dir: state.dir.cur_dir,
+    cur_file: state.dir.cur_file,
+    files: state.dir.files,
+    landmark_order: state.anno.landmark_order,
+    marks: state.anno.marks,
+    image: state.image.image
+})
 
 const mapDispatchToProps = {
-    file_setpos,
+    file_set,
     landmark_set
 }
 
@@ -33,14 +32,16 @@ const onClickHandle = ({ landmark_set, landmark_order }: AnnotateImageProp) => (
     const rect = (e.target as HTMLImageElement).getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    landmark_set(landmark_order, 0, x, y);
+    if (landmark_order !== undefined)
+        landmark_set(landmark_order, 0, x, y);
 }
 
 const onRightClickHandle = ({ landmark_set, landmark_order }: AnnotateImageProp) => (e: MouseEvent) => {
     const rect = (e.target as HTMLImageElement).getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    landmark_set(landmark_order, 1, x, y);
+    if (landmark_order !== undefined)
+        landmark_set(landmark_order, 1, x, y);
     e.preventDefault();
 }
 
@@ -93,7 +94,7 @@ const onClickSearch = (props: AnnotateImageProp) => (e: MouseEvent<HTMLInputElem
     if (value) {
         const pos = (props.files || []).indexOf(value);
         if (pos >= 0)
-            props.file_setpos(pos);
+            props.file_set(pos);
         else
             alert('파일을 찾을 수 없습니다.')
     }

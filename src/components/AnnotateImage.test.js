@@ -7,19 +7,26 @@ import AnnotateImage from './AnnotateImage';
 
 const middleware = [thunk];
 const mockStore = configureMockStore(middleware)
+const initialstate = {
+    dir: {
+        cur_dir: 'dir1',
+        cur_file: 0,
+        files: ['file1', 'file2', 'file3'],
+    },
+    anno: {
+        landmark_order: 0
+    },
+    image: {
+        image: {}
+    }
+}
 
 describe('AnnotateImage', () => {
     let store;
 
     beforeEach(() => {
         moxios.install();
-        store = mockStore({
-            dir: {
-                cur_dir: 'dir1',
-                cur_file: 0,
-                files: ['file1', 'file2', 'file3' ]
-            }
-        })
+        store = mockStore(initialstate);
     })
 
     afterEach(() => {

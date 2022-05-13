@@ -1,5 +1,24 @@
-type NumberUndefined = number | undefined;
+// external. partial type as below. use quicktype later.
+export type LabelType = {
+    [k: string]: {
+        [k: string]: object
+    }
+}
 
-type AppDispatch = typeof store.dispatch
-type RootState = ReturnType<typeof rootReducer>;
-type GetState = () => RootState;
+export type LandmarkType = {
+    [k: number]: {
+        x: number,
+        y: number
+    }[]
+};
+
+export type CollectLandmarkType = {
+    [k: number]: LandmarkType
+}
+
+export type BBoxType = {
+    x: number,
+    y: number,
+    width: number,
+    height: number
+}
