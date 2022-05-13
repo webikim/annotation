@@ -4,7 +4,7 @@ import { AppDispatch, GetState } from "../store";
 
 // action type
 export const IMAGE_POS_SET = 'image/pos/set' as const;
-export const IMAGE_LABEL_SET = 'image/label' as const;
+export const IMAGE_LABEL_GET = 'image/label' as const;
 export const IMAGE_LABEL_CLEAR = 'image/label/clear' as const;
 
 type Position = {
@@ -23,27 +23,25 @@ export const image_setpos = (top: number, left: number) => {
     }
 }
 
-export const set_image_label = (filename: string) => {
-    return (dispatch: AppDispatch, getState: GetState) => {
-        const { dir } = getState();
-        if (dir.cur_dir !== undefined) {
-            ajaxBase('/label/get?' + encodeQueryData({
-                path: dir.cur_dir,
-                name: filename
-            }), GET).then(
-                (response) => {
-                    let label = response.data;
-                    if (label['데이터셋 정보'])
-                        delete label['데이터셋 정보']['데이터셋 상세설명']['폴리곤좌표'];
-                    dispatch(_set_image_label(response.data))
-                }
-            )
-        }
+export const get_image_label = (filename: string) => (dispatch: AppDispatch, getState: GetState) => {
+    const { dir } = getState();
+    if (dir.cur_dir !== undefined) {
+        ajaxBase('/label/get?' + encodeQueryData({
+            path: dir.cur_dir,
+            name: filename
+        }), GET).then(
+            (response) => {
+                let label = response.data;
+                if (label['데이터셋 정보'])
+                    delete label['데이터셋 정보']['데이터셋 상세설명']['폴리곤좌표'];
+                dispatch(_get_image_label(response.data))
+            }
+        )
     }
 }
 
-export const _set_image_label = (data: object) => ({
-    type: IMAGE_LABEL_SET,
+export const _get_image_label = (data: object) => ({
+    type: IMAGE_LABEL_GET,
     payload: data
 })
 
@@ -57,7 +55,7 @@ type ImageSate = {
 }
 
 type ImageAction = ReturnType<typeof image_setpos>
-    | ReturnType<typeof _set_image_label>
+    | ReturnType<typeof _get_image_label>
     | ReturnType<typeof image_label_clear>
 
 // reducer
@@ -70,7 +68,7 @@ const reducer: Reducer<ImageSate, ImageAction> = (state: ImageSate = INITIAL_STA
                 ...state,
                 image: action.payload
             } as ImageSate
-        case IMAGE_LABEL_SET:
+        case IMAGE_LABEL_GET:
             return {
                 ...state,
                 label: action.payload

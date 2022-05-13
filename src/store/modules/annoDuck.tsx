@@ -48,15 +48,13 @@ export const CLOTH_GET = 'cloth/get' as const;
 export const JOB_STATUS = 'job/status' as const;
 
 // action
-export const cloth_type_set = (cloth_type: string) => {
-    return (dispatch: AppDispatch, getState: GetState) => {
-        const { anno } = getState();
-        dispatch(_cloth_type_set(cloth_type));
-        if (anno.marks === undefined)
-            dispatch(landmark_clear());
-        else
-            dispatch(_landmark_set_all(filter_marks({ ...anno }, cloth_type)));
-    }
+export const cloth_type_set = (cloth_type: string) => (dispatch: AppDispatch, getState: GetState) => {
+    const { anno } = getState();
+    dispatch(_cloth_type_set(cloth_type));
+    if (anno.marks === undefined)
+        dispatch(landmark_clear());
+    else
+        dispatch(_landmark_set_all(filter_marks({ ...anno }, cloth_type)));
 }
 
 const _cloth_type_set = (cloth_type: string) => ({
@@ -69,14 +67,12 @@ export const _landmark_set_all = (marks: {}) => ({
     payload: marks
 })
 
-export const landmark_order_set = (landmark_order: number) => {
-    return (dispatch: AppDispatch, getState: GetState) => {
-        const cloth_type = getState().anno.cloth_type;
-        if (cloth_type !== undefined) {
-            const color_index = mark_set[cloth_type].map(each => color_set[each][0]).indexOf(color_key[landmark_order]);
-            if (color_index >= 0)
-                dispatch(_landmark_order_set(landmark_order));
-        }
+export const landmark_order_set = (landmark_order: number) => (dispatch: AppDispatch, getState: GetState) => {
+    const cloth_type = getState().anno.cloth_type;
+    if (cloth_type !== undefined) {
+        const color_index = mark_set[cloth_type].map(each => color_set[each][0]).indexOf(color_key[landmark_order]);
+        if (color_index >= 0)
+            dispatch(_landmark_order_set(landmark_order));
     }
 }
 
@@ -85,13 +81,11 @@ const _landmark_order_set = (landmark_order: number) => ({
     payload: landmark_order
 })
 
-export const landmark_order_clear = (order: number) => {
-    return (dispatch: AppDispatch, getState: GetState) => {
-        const { anno } = getState();
-        let marks = { ...anno.marks }
-        delete marks[order];
-        dispatch(_landmark_order_clear(marks))
-    }
+export const landmark_order_clear = (order: number) => (dispatch: AppDispatch, getState: GetState) => {
+    const { anno } = getState();
+    let marks = { ...anno.marks }
+    delete marks[order];
+    dispatch(_landmark_order_clear(marks))
 }
 
 const _landmark_order_clear = (marks: object) => ({
@@ -99,49 +93,47 @@ const _landmark_order_clear = (marks: object) => ({
     payload: marks
 })
 
-export const landmark_set = (order: number, vis_type: number, x: number, y: number) => {
-    return (dispatch: AppDispatch, getState: GetState) => {
-        if (order !== undefined) {
-            const { anno } = getState();
-            if (anno.marks !== undefined && Object.keys(anno).indexOf('marks') >= 0) {
-                let landmark_in_order = {...anno.marks[order]};
-                if (Object.keys(landmark_in_order) !== undefined && Object.keys(landmark_in_order).length > 0)  {
-                    let landmark = landmark_in_order[vis_type === 1 ? 0: 1]
-                    if ((landmark && landmark.length > 1) || (landmark && landmark_in_order[vis_type]))
-                        landmark_in_order[vis_type === 1 ? 0: 1] = landmark.slice(1);
-                }
-                if (Object.keys(landmark_in_order).indexOf(String(vis_type)) > -1) {
-                    let landmark = landmark_in_order[vis_type]
-                    if (landmark_in_order[vis_type].length > 1)
-                        landmark_in_order[vis_type] = landmark.slice(1);
-                    landmark_in_order[vis_type] = landmark_in_order[vis_type].concat({
+export const landmark_set = (order: number, vis_type: number, x: number, y: number) => (dispatch: AppDispatch, getState: GetState) => {
+    if (order !== undefined) {
+        const { anno } = getState();
+        if (anno.marks !== undefined && Object.keys(anno).indexOf('marks') >= 0) {
+            let landmark_in_order = {...anno.marks[order]};
+            if (Object.keys(landmark_in_order) !== undefined && Object.keys(landmark_in_order).length > 0)  {
+                let landmark = landmark_in_order[vis_type === 1 ? 0: 1]
+                if ((landmark && landmark.length > 1) || (landmark && landmark_in_order[vis_type]))
+                    landmark_in_order[vis_type === 1 ? 0: 1] = landmark.slice(1);
+            }
+            if (Object.keys(landmark_in_order).indexOf(String(vis_type)) > -1) {
+                let landmark = landmark_in_order[vis_type]
+                if (landmark_in_order[vis_type].length > 1)
+                    landmark_in_order[vis_type] = landmark.slice(1);
+                landmark_in_order[vis_type] = landmark_in_order[vis_type].concat({
+                    x: x,
+                    y: y
+                })
+            } else {
+                landmark_in_order = {
+                    ...landmark_in_order,
+                    [vis_type]: [{
                         x: x,
                         y: y
-                    })
-                } else {
-                    landmark_in_order = {
-                        ...landmark_in_order,
-                        [vis_type]: [{
-                            x: x,
-                            y: y
-                        }]
-                    }
+                    }]
                 }
-                dispatch(_landmark_set({
-                    order: order,
-                    vis_type: landmark_in_order
-                }))
-            } else {
-                dispatch(_landmark_set({
-                    order: order,
-                    vis_type: {
-                        [vis_type]: [{
-                            x: x,
-                            y: y
-                        }]
-                    }
-                }));
             }
+            dispatch(_landmark_set({
+                order: order,
+                vis_type: landmark_in_order
+            }))
+        } else {
+            dispatch(_landmark_set({
+                order: order,
+                vis_type: {
+                    [vis_type]: [{
+                        x: x,
+                        y: y
+                    }]
+                }
+            }));
         }
     }
 }
@@ -175,18 +167,18 @@ export const bbox_update_set = (value: number) => ({
     payload: value
 })
 
-export const cloth_get = (name: string) => {
-    return ((dispatch: AppDispatch, getState: GetState) => {
-        const { dir } = getState();
-        if (dir.cur_dir !== undefined) {
-            ajaxBase('/anno/get?' + encodeQueryData({
-                path: dir.cur_dir,
-                name: name
-            }), GET).then(
-                (response) => _cloth_get(response.data)
-            );
-        }
-    })
+export const cloth_get = (name: string) => (dispatch: AppDispatch, getState: GetState) => {
+    const { dir } = getState();
+    if (dir.cur_dir !== undefined) {
+        ajaxBase('/anno/get?' + encodeQueryData({
+            path: dir.cur_dir,
+            name: name
+        }), GET).then(
+            (response) => {
+                dispatch(_cloth_get(response.data))
+            }
+        );
+    }
 }
 
 const _cloth_get = (data: object) => ({
@@ -194,45 +186,42 @@ const _cloth_get = (data: object) => ({
     payload: data
 })
 
-export const cloth_save = () => {
-    return ((dispatch: AppDispatch, getState: GetState) => {
-        const { dir, anno } = getState();
-        if (
-          dir.files !== undefined &&
-          dir.cur_file !== undefined &&
-          anno.marks !== undefined &&
-          Object.keys(anno.marks).length > -1 &&
-          anno.cloth_type !== undefined &&
-          anno.cloth_varied !== undefined
-        ) {
-          ajaxBase("/anno/save", POST, {
+export const cloth_save = () => (dispatch: AppDispatch, getState: GetState) => {
+    const { dir, anno } = getState();
+    if (
+        dir.files !== undefined &&
+        dir.cur_file !== undefined &&
+        anno.marks !== undefined &&
+        Object.keys(anno.marks).length > -1 &&
+        anno.cloth_type !== undefined &&
+        anno.cloth_varied !== undefined
+    ) {
+        ajaxBase("/anno/save", POST, {
             path: dir.cur_dir,
             name: dir.files[dir.cur_file],
             data: {
-              ...anno,
-              marks: filter_marks({ ...anno }, anno.cloth_type),
+                ...anno,
+                marks: filter_marks({ ...anno }, anno.cloth_type),
             },
-          }).then((response) => dispatch(job_status(0)));
-        } else dispatch(job_status(-1));
-    })
+        }).then(
+            (response) => dispatch(job_status(0))
+        );
+    } else dispatch(job_status(-1));
 }
 
-export const cloth_delete = () => {
-    return ((dispatch: AppDispatch, getState: GetState) => {
-        const { dir } = getState();
-        // dispatch(postClient('/anno/delete', CLOTH_DELETE, {
-        if (dir.files && dir.cur_file) {
-            ajaxBase('/anno/delete', DELETE, {
-                path: dir.cur_dir,
-                name: dir.files[dir.cur_file],
-            }).then(
-                () => {
-                    dispatch(_cloth_get({}))
-                    dispatch(job_status(0))
-                }
-            )
-        }
-    })
+export const cloth_delete = () => (dispatch: AppDispatch, getState: GetState) => {
+    const { dir } = getState();
+    if (dir.files !== undefined && dir.cur_file !== undefined) {
+        ajaxBase('/anno/delete', DELETE, {
+            path: dir.cur_dir,
+            name: dir.files[dir.cur_file],
+        }).then(
+            () => {
+                dispatch(_cloth_get({}))
+                dispatch(job_status(0))
+            }
+        )
+    }
 }
 
 export const job_status = (status: number) => ({
@@ -311,6 +300,8 @@ const reducer: Reducer<AnnoState, AnnoAction> = (state: AnnoState = INITIAL_STAT
                 ...state,
                 marks: action.payload
             } as AnnoState
+        case CLOTH_GET:
+            return action.payload
         case JOB_STATUS:
             return {
                 ...state,

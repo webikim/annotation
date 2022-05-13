@@ -22,22 +22,23 @@ describe('dirDuck', () => {
         moxios.uninstall();
     })
 
-    it('should get dir list', async () => {
+    it('should get dir list', (done) => {
         const data = ['dir1', 'dir2', 'dir3']
         moxios.wait(() => {
             var request = moxios.requests.mostRecent()
             request.respondWith({
                 status: 200,
                 response: data
+            }).then(() => {
+                const actual = store.getActions();
+                const expected = [
+                    { type: DIR_LIST, payload: data }
+                ];
+                expect(actual).toEqual(expected);
+                done();
             })
         })
-
-        await store.dispatch(dir_list());
-        const actual = store.getActions();
-        const expected = [
-            { type: DIR_LIST, payload: ['dir1', 'dir2', 'dir3'] }
-        ];
-        expect(actual).toEqual(expected);
+        store.dispatch(dir_list())
     })
 
     it('should set current dir', () => {
@@ -49,21 +50,23 @@ describe('dirDuck', () => {
         expect(actual).toEqual(expected);
     })
 
-    it('should get file list', async () => {
+    it('should get file list', (done) => {
         const data = ['file1', 'file2', 'file3']
         moxios.wait(() => {
             var request = moxios.requests.mostRecent()
             request.respondWith({
                 status: 200,
                 response: data
+            }).then(() => {
+                const actual = store.getActions();
+                const expected = [
+                    { type: FILE_LIST, payload: data }
+                ]
+                expect(actual).toEqual(expected)
+                done();
             })
         })
-        await store.dispatch(file_list('dir1'));
-        const actual = store.getActions();
-        const expected = [
-            { type: FILE_LIST, payload: ['file1', 'file2', 'file3'] }
-        ]
-        expect(actual).toEqual(expected)
+        store.dispatch(file_list('dir1'))
     })
 
     it('should not set current file', () => {

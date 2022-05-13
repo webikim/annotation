@@ -1,6 +1,8 @@
+/* eslint-disable testing-library/await-async-utils */
+import moxios from "moxios";
 import createMockStore from "redux-mock-store"
 import thunk from "redux-thunk";
-import { CLOTH_TYPE_SET, cloth_type_set, CLOTH_VARIED_SET, cloth_varied_set, LANDMARK_CLEAR, LANDMARK_ORDER_CLEAR, landmark_order_clear, LANDMARK_ORDER_SET, landmark_order_set, LANDMARK_SET, landmark_set } from "./annoDuck";
+import { cloth_delete, CLOTH_GET, cloth_get, CLOTH_TYPE_SET, cloth_save, cloth_type_set, CLOTH_VARIED_SET, cloth_varied_set, LANDMARK_CLEAR, LANDMARK_ORDER_CLEAR, landmark_order_clear, LANDMARK_ORDER_SET, landmark_order_set, LANDMARK_SET, landmark_set, JOB_STATUS } from "./annoDuck";
 
 const middleware = [thunk];
 const mockStore = createMockStore(middleware);
@@ -11,8 +13,13 @@ const initialstate = {
 describe('annoDuck', () => {
     let store;
 
-    beforeAll(() => {
+    beforeEach(() => {
         store = mockStore(initialstate);
+        moxios.install();
+    })
+
+    afterEach(() => {
+        moxios.uninstall();
     })
 
     it('should set cloth type', () => {
@@ -77,5 +84,100 @@ describe('annoDuck', () => {
             { type: LANDMARK_SET, payload: { order: 0, vis_type: { 0: [{ x: 12, y: 23 }] } } }
         ];
         expect(action).toEqual(expected);
+    })
+
+    it('should save to file', (done) => {
+        store = mockStore({
+            dir: {
+                files: ['file1'],
+                cur_file: 0
+            },
+            anno: {
+                marks: { 0: {} },
+                cloth_type: 'upper',
+                cloth_varied: 0
+            }
+        })
+        moxios.wait(() => {
+            var request = moxios.requests.mostRecent();
+            request.respondWith({
+                status: 200,
+                response: 'OK'
+            }).then(() => {
+                const action = store.getActions();
+                const expected = [
+                    { type: JOB_STATUS, payload: 0 }
+                ]
+                expect(action).toEqual(expected);
+                done();
+            })
+        })
+        store.dispatch(cloth_save());
+    })
+
+    it('should get from file', (done) => {
+        store = mockStore({
+            dir: {
+                cur_dir: 'out'
+            }
+        })
+        const data = {
+            "cloth_type": "upper",
+            "marks": {
+                "0": {
+                    "0": [
+                        {
+                            "x": 96.4000015258789,
+                            "y": 70.79999542236328
+                        }
+                    ]
+                }
+            },
+            "landmark_order": 0,
+            "cloth_varied": 1,
+            "path": "out",
+            "name": "1070263.jpg"
+        }
+        moxios.wait(() => {
+            var request = moxios.requests.mostRecent();
+            request.respondWith({
+                status: 200,
+                response: data
+            }).then(() => {
+                const action = store.getActions();
+                const expected = [
+                    { type: CLOTH_GET, payload: data }
+                ];
+                expect(action).toEqual(expected);
+                done();
+            })
+        })
+        store.dispatch(cloth_get("1070263.jpg"));
+    })
+
+    it('should delete file', (done) => {
+        store = mockStore({
+            dir: {
+                files: ['file1'],
+                cur_dir: 'out',
+                cur_file: 0
+            }
+        })
+        moxios.wait(() => {
+            var request = moxios.requests.mostRecent();
+            request.respondWith({
+                status: 200,
+                response: 'OK'
+            }).then(() => {
+                const action = store.getActions();
+                const expected = [
+                    { type: CLOTH_GET, payload: {} },
+                    { type: JOB_STATUS, payload: 0 }
+                ]
+                expect(action).toEqual(expected);
+                done();
+            })
+        })
+        store.dispatch(cloth_delete());
     })
 })

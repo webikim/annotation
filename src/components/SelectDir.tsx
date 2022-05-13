@@ -24,9 +24,9 @@ interface SelectDirProps extends PropsFromRedux {
     cookies: Cookies
 }
  
-const onChangeHandle = ({ dir_set, file_set: file_setpos, cookies }: SelectDirProps) => (e : ChangeEvent<HTMLSelectElement>) => {
+const onChangeHandle = ({ dir_set, file_set, cookies }: SelectDirProps) => (e : ChangeEvent<HTMLSelectElement>) => {
     dir_set(e.target.value);
-    file_setpos(parseInt(cookies.get(e.target.value) || 0));
+    file_set(parseInt(cookies.get(e.target.value) || 0));
     e.target.blur();
 }
 
