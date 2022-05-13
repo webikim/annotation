@@ -62,7 +62,6 @@ export const _file_set = (filename: string, pos: number) => ({
     payload: pos
 })
 
-
 export const file_prev = (cookies: Cookies) => (dispatch: AppDispatch, getState: GetState) => {
     const { dir } = getState();
     const cur_file = dir.cur_file || 0

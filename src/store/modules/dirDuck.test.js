@@ -69,12 +69,6 @@ describe('dirDuck', () => {
         store.dispatch(file_list('dir1'))
     })
 
-    it('should not set current file', () => {
-        store.dispatch(file_set(0))
-        const actual = store.getActions();
-        expect(actual).toEqual([]);
-    })
-
     it('should set current file', () => {
         store = mockStore({
             dir: {
