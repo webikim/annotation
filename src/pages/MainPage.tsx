@@ -13,10 +13,13 @@ import ImageNav from '../components/ImageNav'
 
 import { image_setpos } from '../store/modules/imageDuck';
 import { RootState } from '../store/store';
+import BBox from '../components/BBox';
 
 const mapStateToProps = (state: RootState) => {
     return {
+        len_files: state.dir.files?.length || 0,
         cur_dir: state.dir.cur_dir,
+        cur_file: state.dir.cur_file,
     }
 }
 
@@ -40,7 +43,7 @@ const MainPage = (props : MainPageProps) => {
         }
     })
     var right = (<></>);
-    if (props.cur_dir)
+    if (props.cur_dir !== undefined && props.cur_file !== undefined && props.len_files)
         right = (
             <>
                 <p></p>
@@ -57,9 +60,20 @@ const MainPage = (props : MainPageProps) => {
                 </Row>
                 <p></p>
                 <Row>
+                    <span><BsStopFill></BsStopFill> 바운딩 박스 (Bounding Box)</span>
+                    <hr></hr>
+                    <BBox></BBox>
+                </Row>
+                <p></p>
+                <Row>
                     <span><BsStopFill></BsStopFill> 자세 변형 정도 (Variation)</span>
                     <hr></hr>
                     <ClothVaried></ClothVaried>
+                </Row>
+                <p></p>
+                <Row>
+                    <span><BsStopFill></BsStopFill> AI-Hub 데이터 (base data)</span>
+                    <hr></hr>
                 </Row>
             </>
         )
@@ -73,7 +87,7 @@ const MainPage = (props : MainPageProps) => {
                 <Col>
                     <AnnotateImage imgRef={ imgRef }></AnnotateImage>
                     <p></p>
-                    <ImageNav cookies={ props.cookies }></ImageNav>
+                    {(props.len_files > 0 && props.cur_file !== undefined) && <ImageNav cookies={props.cookies}></ImageNav>}
                 </Col>
                 <Col>
                     { right }

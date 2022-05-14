@@ -25,12 +25,10 @@ interface LandmarkProps extends PropsFromRedux {
 }
 
 const onChangeColor = ({ landmark_order_set }: LandmarkProps) => (e: ChangeEvent<HTMLInputElement>) => {
-    console.log('color : ', e.target.value);
     landmark_order_set(parseInt(e.target.value));
 }
 
 const onClickClear = ({ landmark_order_clear }: LandmarkProps, colorkey_order: number): MouseEventHandler<SVGElement> => (e) => {
-    console.log('.... clear : ', colorkey_order);
     landmark_order_clear(colorkey_order);
 }
 

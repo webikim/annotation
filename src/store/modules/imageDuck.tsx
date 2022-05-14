@@ -1,16 +1,12 @@
 import { Reducer } from "redux";
 import { ajaxBase, encodeQueryData, GET } from "../../common/ajax";
+import { LabelType, Position } from "../../typings";
 import { AppDispatch, GetState } from "../store";
 
 // action type
 export const IMAGE_POS_SET = 'image/pos/set' as const;
-export const IMAGE_LABEL_GET = 'image/label' as const;
+export const IMAGE_LABEL_GET = 'image/label/get' as const;
 export const IMAGE_LABEL_CLEAR = 'image/label/clear' as const;
-
-type Position = {
-    top: number,
-    left: number
-}
 
 // action
 export const image_setpos = (top: number, left: number) => {
@@ -51,7 +47,7 @@ export const image_label_clear = () => ({
 
 type ImageSate = {
     image?: Position,
-    label?: object,     // external data. type unknown
+    label?: LabelType,     // external data. type unknown
 }
 
 type ImageAction = ReturnType<typeof image_setpos>

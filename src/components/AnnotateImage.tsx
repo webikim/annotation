@@ -1,24 +1,29 @@
-import React, { Children, CSSProperties, MouseEvent } from 'react'
+import React, { Children, CSSProperties, DragEventHandler, MouseEvent } from 'react'
 import { BsFillFileEarmarkFill } from "react-icons/bs";
 import { connect, ConnectedProps } from 'react-redux'
 
 import { encodeQueryData } from '../common/ajax';
-import { color_set, landmark_set } from '../store/modules/annoDuck';
+import { bbox_set, color_set, landmark_set } from '../store/modules/annoDuck';
 import { file_set } from '../store/modules/dirDuck';
 import { RootState } from '../store/store';
+import { BBoxType, Position } from '../typings';
 
 const mapStateToProps = (state: RootState) => ({
+    bbox: state.anno.bbox,
+    bbox_show: state.anno.bbox_show,
+    bbox_update: state.anno.bbox_update,
     cur_dir: state.dir.cur_dir,
     cur_file: state.dir.cur_file,
     files: state.dir.files,
+    image: state.image.image,
     landmark_order: state.anno.landmark_order,
     marks: state.anno.marks,
-    image: state.image.image
 })
 
 const mapDispatchToProps = {
+    bbox_set,
     file_set,
-    landmark_set
+    landmark_set,
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -83,12 +88,6 @@ const render_marks = (props: AnnotateImageProp) => {
     )
 }
 
-const render_bbox = (props: AnnotateImageProp) => {
-    return (
-        <></>
-    )
-}
-
 const onClickSearch = (props: AnnotateImageProp) => (e: MouseEvent<HTMLInputElement>) => {
     let value = prompt("검색할 파일을 입력하세요", (e.target as HTMLInputElement).value);
     if (value) {
@@ -99,6 +98,73 @@ const onClickSearch = (props: AnnotateImageProp) => (e: MouseEvent<HTMLInputElem
             alert('파일을 찾을 수 없습니다.')
     }
     e.currentTarget.blur();
+}
+
+const onDragTop = (bbox: BBoxType, image: Position, bbox_set: (bbox: object)=> void): DragEventHandler<HTMLImageElement> => (e) => {
+    if (e.pageX !== 0 && e.pageY !== 0) {
+        const moveX = bbox.x - (e.pageX - image.left);
+        const moveY = bbox.y - (e.pageY - image.top);
+        bbox_set({x: bbox.x - moveX, y: bbox.y - moveY, width: bbox.width + moveX, height: bbox.height + moveY});
+    }
+    e.preventDefault();
+}
+
+const onDragDown = (bbox: BBoxType, image: Position, bbox_set: (bbox: object)=> void): DragEventHandler<HTMLImageElement> => (e) => {
+    if (e.pageX !== 0 && e.pageY !== 0) {
+        const moveX = bbox.x + bbox.width - (e.pageX - image.left);
+        const moveY = bbox.y + bbox.height - (e.pageY -image.top);
+        bbox_set({x: bbox.x, y: bbox.y, width: bbox.width - moveX, height: bbox.height - moveY});
+    }
+    e.preventDefault();
+}
+
+const render_bbox = ({ bbox, bbox_show, bbox_update, image,  }: AnnotateImageProp) => {
+    if (bbox !== undefined && image !== undefined && Object.keys(bbox).length > 0 && bbox_show) {
+        let bbox_style: CSSProperties = {
+            border: '2px solid darkgray',
+            position: 'absolute',
+            top: (image.top + bbox.y) + 'px',
+            left: (image.left + bbox.x) + 'px',
+            width: bbox.width + 'px',
+            height: bbox.height + 'px'
+        }
+        let update_box = (<></>)
+        if (bbox_update) {
+            const top_update: CSSProperties = {
+                width: '9px',
+                height: '9px',
+                border: '3px solid black',
+                position: 'absolute',
+                objectFit: 'fill',
+                top: (image.top + bbox.y - 4) + 'px',
+                left: (image.left + bbox.x - 4) + 'px'
+            }
+            const bottom_update: CSSProperties = {
+                width: '9px',
+                height: '9px',
+                border: '3px solid black',
+                position: 'absolute',
+                objectFit: 'fill',
+                top: (image.top + bbox.y + bbox.height - 6) + 'px',
+                left: (image.left + bbox.x + bbox.width - 6) + 'px'
+            }
+            update_box = (
+                <>
+                    <img alt='top box' style={ top_update } src='static/33.jpg' onDrag={ onDragTop(bbox, image, bbox_set) }></img>
+                    <img alt='bottom box' style={ bottom_update } src='static/33.jpg' onDrag={ onDragDown(bbox, image, bbox_set) }></img>
+                </>
+            )
+        }
+        return (
+            <>
+                <div data-testid='bbox' style={ bbox_style }></div>
+                { update_box }
+            </>
+        )
+    }
+    return (
+        <></>
+    )
 }
 
 const AnnotateImage = (props: AnnotateImageProp) => {

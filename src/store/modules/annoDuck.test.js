@@ -2,7 +2,7 @@
 import moxios from "moxios";
 import createMockStore from "redux-mock-store"
 import thunk from "redux-thunk";
-import { cloth_delete, CLOTH_GET, cloth_get, CLOTH_TYPE_SET, cloth_save, cloth_type_set, CLOTH_VARIED_SET, cloth_varied_set, LANDMARK_CLEAR, LANDMARK_ORDER_CLEAR, landmark_order_clear, LANDMARK_ORDER_SET, landmark_order_set, LANDMARK_SET, landmark_set, JOB_STATUS } from "./annoDuck";
+import { cloth_delete, CLOTH_GET, cloth_get, CLOTH_TYPE_SET, cloth_save, cloth_type_set, CLOTH_VARIED_SET, cloth_varied_set, LANDMARK_CLEAR, LANDMARK_ORDER_CLEAR, landmark_order_clear, LANDMARK_ORDER_SET, landmark_order_set, LANDMARK_SET, landmark_set, JOB_STATUS, BBOX_SET } from "./annoDuck";
 
 const middleware = [thunk];
 const mockStore = createMockStore(middleware);
@@ -27,6 +27,7 @@ describe('annoDuck', () => {
         const action = store.getActions();
         const expected = [
             { type: CLOTH_TYPE_SET, payload: 'upper' },
+            { type: BBOX_SET, payload: {} },
             { type: LANDMARK_CLEAR }
         ];
         expect(action).toEqual(expected);

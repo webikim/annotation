@@ -14,10 +14,16 @@ const initialstate = {
         files: ['file1', 'file2', 'file3'],
     },
     anno: {
-        landmark_order: 0
+        landmark_order: 0,
+        bbox: {
+            y: 4, x: 5
+        },
+        bbox_show: 1
     },
     image: {
-        image: {}
+        image: {
+            top: 2, left: 3
+        }
     }
 }
 
@@ -40,5 +46,13 @@ describe('AnnotateImage', () => {
         )
         const imgElem = screen.getByAltText('annotation target')
         expect(imgElem).toBeInTheDocument();
+    })
+
+    it('should render bounding box', () => {
+        const imgRef = jest.fn();
+        render(
+            <AnnotateImage imgRef={ imgRef } store={ store } />
+        )
+        expect(screen.getByTestId(/bbox/i)).toBeInTheDocument();
     })
 });

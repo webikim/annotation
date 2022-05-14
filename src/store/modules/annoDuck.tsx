@@ -1,6 +1,6 @@
 import { Reducer } from "redux";
 import { ajaxBase, DELETE, encodeQueryData, GET, POST } from "../../common/ajax";
-import { BBoxType, CollectLandmarkType } from "../../typings";
+import { BBoxType, CollectLandmarkType, LabelType } from "../../typings";
 import { AppDispatch, GetState } from "../store";
 
 export const mark_set: { [k: string]: string[] } = {
@@ -14,6 +14,12 @@ export const color_set: { [k: string]: string[] } = {
     'sleeve': ['w', 'red', 'darkgray'],
     'waistline': ['e', 'greenyellow', 'magenta'],
     'hem': ['r', 'deepskyblue', 'orange']
+}
+
+const cloth_map: {[k: string]: string[]} = {
+    'upper': ['상의'],
+    'lower': ['하의'],
+    'full': ['아우터', '원피스']
 }
 
 export const color_key = Object.keys(color_set).map(each => color_set[each][0]);
@@ -33,6 +39,45 @@ const filter_marks = (anno: AnnoState, cloth_type: string) => {
     return {}
 }
 
+const get_ratio = (width: number, height: number) => {
+    if (width > height)
+        return 512 / width;
+    else
+        return 512 / height;
+}
+
+export const get_bbox = (label: LabelType, ai_bbox: LabelType) => {
+    if (label['이미지 정보']['이미지 너비'] !== undefined) {
+        const ratio = get_ratio(+label['이미지 정보']['이미지 너비'], +label['이미지 정보']['이미지 높이']);
+        const bbox = {
+            x: +ai_bbox[0]['X좌표'] * ratio,
+            y: +ai_bbox[0]['Y좌표'] * ratio,
+            width: +ai_bbox[0]['가로'] * ratio,
+            height: +ai_bbox[0]['세로'] * ratio
+        }
+        return bbox;
+    }
+}
+
+export const decode_ai_label = (label: any, cloth_type: string) => {
+    const ai_image_bboxes = label['데이터셋 정보']['데이터셋 상세설명']['렉트좌표'];
+    if (cloth_type !== undefined) {
+        if (cloth_type === 'full') {
+            for (let i in cloth_map[cloth_type]) {
+                const ai_bbox = ai_image_bboxes[cloth_map[cloth_type][i]];
+                if (Object.keys(ai_bbox[0]).length > 0) {
+                    return ai_bbox;
+                }
+            }
+        } else {
+            const ai_bbox = ai_image_bboxes[cloth_map[cloth_type][0]];
+            if (Object.keys(ai_bbox[0]).length > 0) {
+                return ai_bbox;
+            }
+        }
+    }
+}
+
 // action type
 export const CLOTH_TYPE_SET = 'cloth/type/set' as const;
 export const LANDMARK_ORDER_SET = 'cloth/color/set' as const;
@@ -49,8 +94,20 @@ export const JOB_STATUS = 'job/status' as const;
 
 // action
 export const cloth_type_set = (cloth_type: string) => (dispatch: AppDispatch, getState: GetState) => {
-    const { anno } = getState();
+    const { anno, image } = getState();
     dispatch(_cloth_type_set(cloth_type));
+    if (image !== undefined && image.label !== undefined && image.label['이미지 정보']) {
+        const ai_bbox = decode_ai_label(image.label, cloth_type);
+        if (ai_bbox !== undefined) {
+            const bbox = get_bbox(image.label, ai_bbox);
+            if (ai_bbox.length > 0 && bbox !== undefined) 
+                dispatch(bbox_set(bbox));
+            else
+                dispatch(bbox_set({}));
+        } else
+            dispatch(bbox_set({}));
+    } else
+        dispatch(bbox_set({}));
     if (anno.marks === undefined)
         dispatch(landmark_clear());
     else
@@ -152,7 +209,7 @@ export const cloth_varied_set = (cloth_varied: number) => ({
     payload: cloth_varied
 })
 
-export const bbox_set = (bbox: BBoxType) => ({
+export const bbox_set = (bbox: BBoxType | {}) => ({
     type: BBOX_SET,
     payload: bbox
 })
@@ -301,7 +358,22 @@ const reducer: Reducer<AnnoState, AnnoAction> = (state: AnnoState = INITIAL_STAT
                 marks: action.payload
             } as AnnoState
         case CLOTH_GET:
-            return action.payload
+            return action.payload as AnnoState
+        case BBOX_SET:
+            return {
+                ...state,
+                bbox: action.payload
+            } as AnnoState
+        case BBOX_SHOW_SET:
+            return {
+                ...state,
+                bbox_show: action.payload
+            } as AnnoState
+        case BBOX_UPDATE_SET:
+            return {
+                ...state,
+                bbox_update: action.payload
+            } as AnnoState
         case JOB_STATUS:
             return {
                 ...state,

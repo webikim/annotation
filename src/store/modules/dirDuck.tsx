@@ -3,6 +3,7 @@ import { Reducer } from "redux";
 import { ajaxBase, GET } from "../../common/ajax";
 import { AppDispatch, GetState } from "../store";
 import { cloth_get } from "./annoDuck";
+import { get_image_label } from "./imageDuck";
 
 // action type
 export const DIR_LIST = "dir/list" as const;
@@ -51,6 +52,7 @@ export const file_set = (pos: number) => async (dispatch: AppDispatch, getState:
         dispatch(_file_set(dir['files'][pos], pos));
         const filename = dir['files'][pos];
         dispatch(cloth_get(filename));
+        dispatch(get_image_label(filename));
     } else {
         await new Promise(resolve => setTimeout(resolve, 500));
         dispatch(file_set(pos));
