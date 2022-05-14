@@ -13,6 +13,7 @@ const mapStateToProps = (state: RootState) => ({
     save_result: state.anno.status,
     cur_dir: state.dir.cur_dir,
     cur_file: state.dir.cur_file,
+    auto_next: state.anno.auto_next
 })
 
 const mapDispatchToProps = {
@@ -69,6 +70,8 @@ const Nav = (props: NavProps) => {
             if (props.save_result === 1) {
                 alert('저장되었습니다.');
                 props.clear_status();
+                if (props.auto_next)
+                    props.file_next(props.cookies);
             } else if (props.save_result === -1) {
                 alert('정보를 모두 입력하세요!');
                 props.clear_status();

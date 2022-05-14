@@ -91,6 +91,7 @@ export const BBOX_SHOW_SET = 'bbox/show/set' as const;
 export const BBOX_UPDATE_SET = 'bbox/update/set' as const;
 export const CLOTH_GET = 'cloth/get' as const;
 export const JOB_STATUS = 'job/status' as const;
+export const IMAGE_AUTO_NEXT = 'image/autonext' as const;
 
 // action
 export const cloth_type_set = (cloth_type: string) => (dispatch: AppDispatch, getState: GetState) => {
@@ -261,7 +262,7 @@ export const cloth_save = () => (dispatch: AppDispatch, getState: GetState) => {
                 marks: filter_marks({ ...anno }, anno.cloth_type),
             },
         }).then(
-            (response) => dispatch(job_status(0))
+            (response) => dispatch(job_status(1))
         );
     } else dispatch(job_status(-1));
 }
@@ -291,6 +292,11 @@ export const clear_status = () => ({
     payload: 0
 })
 
+export const image_auto_next = (value: number) => ({
+    type: IMAGE_AUTO_NEXT,
+    payload: value
+})
+
 type AnnoAction = ReturnType<typeof _cloth_type_set>
     | ReturnType<typeof _landmark_order_set>
     | ReturnType<typeof _landmark_order_clear>
@@ -303,6 +309,7 @@ type AnnoAction = ReturnType<typeof _cloth_type_set>
     | ReturnType<typeof bbox_update_set>
     | ReturnType<typeof _cloth_get>
     | ReturnType<typeof job_status>
+    | ReturnType<typeof image_auto_next>
 
 type AnnoState = {
     cloth_type?: string,
@@ -312,7 +319,8 @@ type AnnoState = {
     bbox?: BBoxType,
     bbox_show?: number,
     bbox_update?: number,
-    status?: number
+    status?: number,
+    auto_next?: number
 }
 
 const INITIAL_STATE: AnnoState = {}
@@ -378,6 +386,11 @@ const reducer: Reducer<AnnoState, AnnoAction> = (state: AnnoState = INITIAL_STAT
             return {
                 ...state,
                 status: action.payload
+            } as AnnoState
+        case IMAGE_AUTO_NEXT:
+            return {
+                ...state,
+                auto_next: action.payload
             } as AnnoState
         default:
             return state;
