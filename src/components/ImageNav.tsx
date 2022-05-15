@@ -81,30 +81,35 @@ const Nav = (props: NavProps) => {
     
     if (props.files) {
         return (
-            <Row>
-                <Col>
-                    <Button variant='outline-secondary' size='sm' onClick={ onClickPrev(props) }>
-                        <BsArrowLeftShort></BsArrowLeftShort>이전</Button>
-                </Col>
-                <Col>
-                    <input style={{ width: '80px', border: '2px solid #ced4da', padding: '1px 2px', borderRadius: '3px' }} type='text' value={ (props.cur_file || 0) + 1 } onClick={ onClickValue(props) } onChange={ (e) => { } }/>
-                    <span>/({ (props.files || []).length })</span>
-                </Col>
-                <Col>
-                    <Button variant='outline-secondary' size='sm' onClick={ onClickNext(props) }>
-                        다음<BsArrowRightShort></BsArrowRightShort></Button>
-                </Col>
-                <Col>
-                    <Row>
-                        <Col>
-                            <Button onClick={ onClickSave(props) }>저장</Button>
-                        </Col>
-                        <Col>
-                            <Button style={{ backgroundColor: 'red' }} onClick={ onClickDelete(props) }>삭제</Button>
-                        </Col>
-                    </Row>
-                </Col>
-            </Row>
+            <>
+                <Row>
+                    <Col>
+                        <Button variant='outline-secondary' size='sm' onClick={ onClickPrev(props) }>
+                            <BsArrowLeftShort></BsArrowLeftShort>이전</Button>
+                    </Col>
+                    <Col>
+                        <input style={{ width: '80px', border: '2px solid #ced4da', padding: '1px 2px', borderRadius: '3px' }} type='text' value={ (props.cur_file || 0) + 1 } onClick={ onClickValue(props) } onChange={ (e) => { } }/>
+                        <span>/({ (props.files || []).length })</span>
+                    </Col>
+                    <Col>
+                        <Button variant='outline-secondary' size='sm' onClick={ onClickNext(props) }>
+                            다음<BsArrowRightShort></BsArrowRightShort></Button>
+                    </Col>
+                    <Col>
+                    </Col>
+                </Row>
+                <p></p>
+                <Row>
+                    <Col></Col>
+                    <Col></Col>
+                    <Col>
+                        <Button onClick={ onClickSave(props) }>저장</Button>
+                    </Col>
+                    <Col>
+                        <Button style={{ backgroundColor: 'red' }} onClick={ onClickDelete(props) }>삭제</Button>
+                    </Col>
+                </Row>
+            </>
         )
     } else
         return (

@@ -1,4 +1,4 @@
-import React, { Children, CSSProperties, DragEventHandler, MouseEvent } from 'react'
+import React, { Children, CSSProperties, DragEventHandler, LegacyRef, MouseEvent, useEffect, useRef, useState } from 'react'
 import { BsFillFileEarmarkFill } from "react-icons/bs";
 import { connect, ConnectedProps } from 'react-redux'
 
@@ -15,7 +15,6 @@ const mapStateToProps = (state: RootState) => ({
     cur_dir: state.dir.cur_dir,
     cur_file: state.dir.cur_file,
     files: state.dir.files,
-    image: state.image.image,
     landmark_order: state.anno.landmark_order,
     marks: state.anno.marks,
 })
@@ -23,20 +22,21 @@ const mapStateToProps = (state: RootState) => ({
 const mapDispatchToProps = {
     bbox_set,
     file_set,
-    landmark_set,
+    landmark_set
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 interface AnnotateImageProp extends PropsFromRedux {
-    imgRef: any
+
 }
 
 const onClickHandle = ({ landmark_set, landmark_order }: AnnotateImageProp) => (e: MouseEvent) => {
     const rect = (e.target as HTMLImageElement).getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
+    console.log('..... rect : ', rect, ', x: ', x, ', y: ', y)
     if (landmark_order !== undefined)
         landmark_set(landmark_order, 0, x, y);
 }
@@ -50,9 +50,9 @@ const onRightClickHandle = ({ landmark_set, landmark_order }: AnnotateImageProp)
     e.preventDefault();
 }
 
-const render_marks = (props: AnnotateImageProp) => {
+const render_marks = (props: AnnotateImageProp, pos: Position) => {
     let elem = [];
-    if (props.marks !== undefined && props.image !== undefined) {
+    if (props.marks !== undefined) {
         const marks = props.marks;
         const marks_keys: string[] = Object.keys(marks);
         for (let i in marks_keys) {
@@ -67,8 +67,8 @@ const render_marks = (props: AnnotateImageProp) => {
                         height: '9px',
                         backgroundColor: colors[parseInt(order_keys[j]) + 1],
                         position: 'absolute',
-                        top: (props.image.top + mark.y - 4) + 'px',
-                        left: (props.image.left + mark.x - 4) + 'px',
+                        top: (pos.top + mark.y - 4) + 'px',
+                        left: (pos.left + mark.x - 4) + 'px',
                         borderStyle: 'solid'
                     }
                     elem.push(
@@ -100,31 +100,31 @@ const onClickSearch = (props: AnnotateImageProp) => (e: MouseEvent<HTMLInputElem
     e.currentTarget.blur();
 }
 
-const onDragTop = (bbox: BBoxType, image: Position, bbox_set: (bbox: object)=> void): DragEventHandler<HTMLImageElement> => (e) => {
+const onDragTop = (bbox: BBoxType, pos: Position, bbox_set: (bbox: object)=> void): DragEventHandler<HTMLImageElement> => (e) => {
     if (e.pageX !== 0 && e.pageY !== 0) {
-        const moveX = bbox.x - (e.pageX - image.left);
-        const moveY = bbox.y - (e.pageY - image.top);
+        const moveX = bbox.x - (e.pageX - pos.left);
+        const moveY = bbox.y - (e.pageY - pos.top);
         bbox_set({x: bbox.x - moveX, y: bbox.y - moveY, width: bbox.width + moveX, height: bbox.height + moveY});
     }
     e.preventDefault();
 }
 
-const onDragDown = (bbox: BBoxType, image: Position, bbox_set: (bbox: object)=> void): DragEventHandler<HTMLImageElement> => (e) => {
+const onDragDown = (bbox: BBoxType, pos: Position, bbox_set: (bbox: object)=> void): DragEventHandler<HTMLImageElement> => (e) => {
     if (e.pageX !== 0 && e.pageY !== 0) {
-        const moveX = bbox.x + bbox.width - (e.pageX - image.left);
-        const moveY = bbox.y + bbox.height - (e.pageY -image.top);
+        const moveX = bbox.x + bbox.width - (e.pageX - pos.left);
+        const moveY = bbox.y + bbox.height - (e.pageY -pos.top);
         bbox_set({x: bbox.x, y: bbox.y, width: bbox.width - moveX, height: bbox.height - moveY});
     }
     e.preventDefault();
 }
 
-const render_bbox = ({ bbox, bbox_show, bbox_update, image,  }: AnnotateImageProp) => {
-    if (bbox !== undefined && image !== undefined && Object.keys(bbox).length > 0 && bbox_show) {
+const render_bbox = ({ bbox, bbox_show, bbox_update  }: AnnotateImageProp, pos: Position) => {
+    if (bbox !== undefined && Object.keys(bbox).length > 0 && bbox_show) {
         let bbox_style: CSSProperties = {
             border: '2px solid darkgray',
             position: 'absolute',
-            top: (image.top + bbox.y) + 'px',
-            left: (image.left + bbox.x) + 'px',
+            top: (pos.top + bbox.y) + 'px',
+            left: (pos.left + bbox.x) + 'px',
             width: bbox.width + 'px',
             height: bbox.height + 'px'
         }
@@ -136,8 +136,8 @@ const render_bbox = ({ bbox, bbox_show, bbox_update, image,  }: AnnotateImagePro
                 border: '3px solid black',
                 position: 'absolute',
                 objectFit: 'fill',
-                top: (image.top + bbox.y - 4) + 'px',
-                left: (image.left + bbox.x - 4) + 'px'
+                top: (pos.top + bbox.y - 4) + 'px',
+                left: (pos.left + bbox.x - 4) + 'px'
             }
             const bottom_update: CSSProperties = {
                 width: '9px',
@@ -145,13 +145,13 @@ const render_bbox = ({ bbox, bbox_show, bbox_update, image,  }: AnnotateImagePro
                 border: '3px solid black',
                 position: 'absolute',
                 objectFit: 'fill',
-                top: (image.top + bbox.y + bbox.height - 6) + 'px',
-                left: (image.left + bbox.x + bbox.width - 6) + 'px'
+                top: (pos.top + bbox.y + bbox.height - 6) + 'px',
+                left: (pos.left + bbox.x + bbox.width - 6) + 'px'
             }
             update_box = (
                 <>
-                    <img alt='top box' style={ top_update } src='static/33.jpg' onDrag={ onDragTop(bbox, image, bbox_set) }></img>
-                    <img alt='bottom box' style={ bottom_update } src='static/33.jpg' onDrag={ onDragDown(bbox, image, bbox_set) }></img>
+                    <img alt='top box' style={ top_update } src='static/33.jpg' onDrag={ onDragTop(bbox, pos, bbox_set) }></img>
+                    <img alt='bottom box' style={ bottom_update } src='static/33.jpg' onDrag={ onDragDown(bbox, pos, bbox_set) }></img>
                 </>
             )
         }
@@ -168,34 +168,35 @@ const render_bbox = ({ bbox, bbox_show, bbox_update, image,  }: AnnotateImagePro
 }
 
 const AnnotateImage = (props: AnnotateImageProp) => {
-    if (props.files !== undefined && props.files.length > 0 && props.cur_file !== undefined) {
-        const file = props.files[props.cur_file];
+    const { files, cur_file } = props;
+    const [pos, setPos] = useState({ top: 0, left: 0 })
+    const ref = useRef<HTMLElement>();
+    useEffect(() => {
+        if (ref.current) {
+            const bbox = (ref.current as HTMLImageElement).getBoundingClientRect();
+            setPos({ top: bbox.top, left: bbox.left });
+        }
+    }, [props])
+    if (files !== undefined && files.length > 0 && cur_file !== undefined) {
+        const file = files[cur_file];
         return (
             <>
                 <p style={{ fontWeight: 700 }}><BsFillFileEarmarkFill></BsFillFileEarmarkFill> 파일명 (filename) :&nbsp; 
                     <input style={{ border: '2px solid #ced4da', padding: '1px 2px', borderRadius: '3px' }}
                         type='text' value={file} onClick={onClickSearch(props)} onChange={(e) => { }}></input>
                 </p>
-                <div>
-                    <img alt='annotation target' ref={ props.imgRef } draggable='false'
+                <div ref={ ref as LegacyRef<HTMLDivElement> } >
+                    <img alt='annotation target' draggable='false'
                         src={'/img?' + encodeQueryData({ 'path': '' + props.cur_dir, 'name': '' + file })}
                             onClick={ onClickHandle(props) }
                             onContextMenu={ onRightClickHandle(props) }></img>
                 </div>
-                { render_marks(props) }
-                { render_bbox(props) }
+                { render_marks(props, pos) }
+                { render_bbox(props, pos) }
             </>
         )
-    } else {
-        return (
-            <>
-                <p> </p>
-                <div>
-                    <img ref={ props.imgRef } src='static/33.jpg' alt='reference'></img>
-                </div>
-            </>
-        )
-    }
+    } else
+        return <></>
 }
 
 export default connector(AnnotateImage)

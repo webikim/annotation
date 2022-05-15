@@ -1,24 +1,13 @@
 import { Reducer } from "redux";
 import { ajaxBase, encodeQueryData, GET } from "../../common/ajax";
-import { LabelType, Position } from "../../typings";
+import { LabelType } from "../../typings";
 import { AppDispatch, GetState } from "../store";
 
 // action type
-export const IMAGE_POS_SET = 'image/pos/set' as const;
 export const IMAGE_LABEL_GET = 'image/label/get' as const;
 export const IMAGE_LABEL_CLEAR = 'image/label/clear' as const;
 
 // action
-export const image_setpos = (top: number, left: number) => {
-    return {
-        type: IMAGE_POS_SET,
-        payload: {
-            top: top,
-            left: left
-        }
-    }
-}
-
 export const get_image_label = (filename: string) => (dispatch: AppDispatch, getState: GetState) => {
     const { dir } = getState();
     if (dir.cur_dir !== undefined) {
@@ -46,12 +35,10 @@ export const image_label_clear = () => ({
 })
 
 type ImageSate = {
-    image?: Position,
-    label?: LabelType,     // external data. type unknown
+    label?: LabelType   // external data. type unknown
 }
 
-type ImageAction = ReturnType<typeof image_setpos>
-    | ReturnType<typeof _get_image_label>
+type ImageAction = ReturnType<typeof _get_image_label>
     | ReturnType<typeof image_label_clear>
 
 // reducer
@@ -59,11 +46,6 @@ const INITIAL_STATE = {}
 
 const reducer: Reducer<ImageSate, ImageAction> = (state: ImageSate = INITIAL_STATE, action: ImageAction) => {
     switch (action.type) {
-        case IMAGE_POS_SET:
-            return {
-                ...state,
-                image: action.payload
-            } as ImageSate
         case IMAGE_LABEL_GET:
             return {
                 ...state,

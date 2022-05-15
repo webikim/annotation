@@ -215,6 +215,10 @@ export const bbox_set = (bbox: BBoxType | {}) => ({
     payload: bbox
 })
 
+export const bbox_show_toggle = () => (dispatch: AppDispatch, getState: GetState) => {
+    dispatch(bbox_show_set(getState().anno.bbox_show === 1 ? 0 : 1));
+}
+
 export const bbox_show_set = (value: number) => ({
     type: BBOX_SHOW_SET,
     payload: value

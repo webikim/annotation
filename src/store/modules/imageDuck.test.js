@@ -2,7 +2,7 @@
 import moxios from "moxios";
 import createMockStore from "redux-mock-store"
 import thunk from "redux-thunk"
-import { get_image_label, IMAGE_LABEL_GET, IMAGE_POS_SET, image_setpos } from "./imageDuck";
+import { get_image_label, IMAGE_LABEL_GET } from "./imageDuck";
 
 const middleware = [thunk];
 const mockStore = createMockStore(middleware);
@@ -23,15 +23,6 @@ describe('imageDuck', () => {
 
     afterEach(() => {
         moxios.uninstall();
-    })
-
-    it('should set image position', () => {
-        store.dispatch(image_setpos(1, 2));
-        const action = store.getActions();
-        const expected = [
-            { type: IMAGE_POS_SET, payload: { top: 1, left: 2 } }
-        ]
-        expect(action).toEqual(expected);
     })
 
     it('should get image label', (done) => {

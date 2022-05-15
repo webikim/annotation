@@ -107,7 +107,7 @@ describe('annoDuck', () => {
             }).then(() => {
                 const action = store.getActions();
                 const expected = [
-                    { type: JOB_STATUS, payload: 0 }
+                    { type: JOB_STATUS, payload: 1 }
                 ]
                 expect(action).toEqual(expected);
                 done();
