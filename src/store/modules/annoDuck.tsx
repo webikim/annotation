@@ -1,5 +1,6 @@
 import { Reducer } from "redux";
 import { ajaxBase, DELETE, encodeQueryData, GET, POST } from "../../common/ajax";
+import { API_ANNO_DELETE, API_ANNO_GET, API_ANNO_SAVE } from "../../common/urls";
 import { BBoxType, CollectLandmarkType, LabelType } from "../../typings";
 import { AppDispatch, GetState } from "../store";
 
@@ -232,7 +233,7 @@ export const bbox_update_set = (value: number) => ({
 export const cloth_get = (name: string) => (dispatch: AppDispatch, getState: GetState) => {
     const { dir } = getState();
     if (dir.cur_dir !== undefined) {
-        ajaxBase('/anno/get?' + encodeQueryData({
+        ajaxBase(API_ANNO_GET + '?' + encodeQueryData({
             path: dir.cur_dir,
             name: name
         }), GET).then(
@@ -258,7 +259,7 @@ export const cloth_save = () => (dispatch: AppDispatch, getState: GetState) => {
         anno.cloth_type !== undefined &&
         anno.cloth_varied !== undefined
     ) {
-        ajaxBase("/anno/save", POST, {
+        ajaxBase(API_ANNO_SAVE, POST, {
             path: dir.cur_dir,
             name: dir.files[dir.cur_file],
             data: {
@@ -274,7 +275,7 @@ export const cloth_save = () => (dispatch: AppDispatch, getState: GetState) => {
 export const cloth_delete = () => (dispatch: AppDispatch, getState: GetState) => {
     const { dir } = getState();
     if (dir.files !== undefined && dir.cur_file !== undefined) {
-        ajaxBase('/anno/delete', DELETE, {
+        ajaxBase(API_ANNO_DELETE, DELETE, {
             path: dir.cur_dir,
             name: dir.files[dir.cur_file],
         }).then(

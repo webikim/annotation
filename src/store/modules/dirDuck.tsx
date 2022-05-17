@@ -1,6 +1,7 @@
 import { Cookies } from "react-cookie";
 import { Reducer } from "redux";
 import { ajaxBase, GET } from "../../common/ajax";
+import { API_DIR_LIST, API_FILE_LIST } from "../../common/urls";
 import { AppDispatch, GetState } from "../store";
 import { cloth_get } from "./annoDuck";
 import { get_image_label } from "./imageDuck";
@@ -13,7 +14,7 @@ export const FILE_SET = 'file/set' as const;
 
 // action
 export const dir_list = () => async (dispatch: AppDispatch) => {
-    await ajaxBase("/dir/list", GET).then(
+    await ajaxBase(API_DIR_LIST, GET).then(
         (response) => dispatch(_dir_list(response.data))
     );
 };
@@ -36,7 +37,7 @@ export const _dir_set = (dir_name: string) => ({
 });
 
 export const file_list = (dir_name: string) => (dispatch: AppDispatch) => {
-    ajaxBase('/file/list', GET, {'path': encodeURI(dir_name)}).then(
+    ajaxBase(API_FILE_LIST, GET, {'path': encodeURI(dir_name)}).then(
         (response) => dispatch(_file_list(response.data))
     );
 }

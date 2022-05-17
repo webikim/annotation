@@ -1,5 +1,6 @@
 import { Reducer } from "redux";
 import { ajaxBase, encodeQueryData, GET } from "../../common/ajax";
+import { API_LABEL_GET } from "../../common/urls";
 import { LabelType } from "../../typings";
 import { AppDispatch, GetState } from "../store";
 
@@ -11,7 +12,7 @@ export const IMAGE_LABEL_CLEAR = 'image/label/clear' as const;
 export const get_image_label = (filename: string) => (dispatch: AppDispatch, getState: GetState) => {
     const { dir } = getState();
     if (dir.cur_dir !== undefined) {
-        ajaxBase('/label/get?' + encodeQueryData({
+        ajaxBase(API_LABEL_GET + '?' + encodeQueryData({
             path: dir.cur_dir,
             name: filename
         }), GET).then(
