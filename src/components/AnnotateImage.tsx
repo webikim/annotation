@@ -3,6 +3,7 @@ import { BsFillFileEarmarkFill } from "react-icons/bs";
 import { connect, ConnectedProps } from 'react-redux'
 
 import { encodeQueryData } from '../common/ajax';
+import { API_IMG_GET } from '../common/urls';
 import { bbox_set, color_set, landmark_set } from '../store/modules/annoDuck';
 import { file_set } from '../store/modules/dirDuck';
 import { RootState } from '../store/store';
@@ -187,7 +188,7 @@ const AnnotateImage = (props: AnnotateImageProp) => {
                 </p>
                 <div ref={ ref as LegacyRef<HTMLDivElement> } >
                     <img alt='annotation target' draggable='false'
-                        src={'/img?' + encodeQueryData({ 'path': '' + props.cur_dir, 'name': '' + file })}
+                        src={API_IMG_GET + '?' + encodeQueryData({ 'path': '' + props.cur_dir, 'name': '' + file })}
                             onClick={ onClickHandle(props) }
                             onContextMenu={ onRightClickHandle(props) }></img>
                 </div>
