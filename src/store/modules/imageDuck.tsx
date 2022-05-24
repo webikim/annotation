@@ -5,6 +5,7 @@ import { LabelType } from "../../typings";
 import { AppDispatch, GetState } from "../store";
 
 // action type
+export const IMAGE_AUTO_NEXT = 'image/autonext' as const;
 export const IMAGE_LABEL_GET = 'image/label/get' as const;
 export const IMAGE_LABEL_CLEAR = 'image/label/clear' as const;
 
@@ -35,12 +36,19 @@ export const image_label_clear = () => ({
     type: IMAGE_LABEL_CLEAR
 })
 
+export const image_auto_next = (value: number) => ({
+    type: IMAGE_AUTO_NEXT,
+    payload: value
+})
+
 type ImageSate = {
     label?: LabelType   // external data. type unknown
+    auto_next?: number
 }
 
 type ImageAction = ReturnType<typeof _get_image_label>
     | ReturnType<typeof image_label_clear>
+    | ReturnType<typeof image_auto_next>
 
 // reducer
 const INITIAL_STATE = {}
@@ -56,6 +64,11 @@ const reducer: Reducer<ImageSate, ImageAction> = (state: ImageSate = INITIAL_STA
             return {
                 ...state,
                 label: {}
+            } as ImageSate
+        case IMAGE_AUTO_NEXT:
+            return {
+                ...state,
+                auto_next: action.payload
             } as ImageSate
         default:
             return state;

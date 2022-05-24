@@ -21,7 +21,7 @@ describe('BBox', () => {
         render(
             <BBox store={ store } />
         )
-        expect(screen.getAllByText(/박스/i).length).toEqual(1)
+        expect(screen.getAllByText(/박스/i).length).toEqual(2)
     })
 
     it('should render bbox options', () => {
@@ -34,6 +34,6 @@ describe('BBox', () => {
         render(
             <BBox store={ store } />
         )
-        expect(screen.getAllByText(/박스/i).length).toEqual(2)
+        expect(screen.getAllByText(/박스/i).length).toEqual(3)
     })
 })

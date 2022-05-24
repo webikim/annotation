@@ -1,12 +1,11 @@
+import { Box, Container, CssBaseline, Grid } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Row, Col } from 'react-bootstrap';
 import { Cookies } from 'react-cookie';
 import { connect, ConnectedProps } from 'react-redux';
-
 import AnnotateImage from '../components/AnnotateImage';
-import ImageNav from '../components/ImageNav';
 import RightPane from '../components/RightPane';
 import SelectDir from '../components/SelectDir';
+
 import { cloth_type_set, landmark_order_set, cloth_save, cloth_varied_set, bbox_show_toggle, mark_set, color_key } from '../store/modules/annoDuck';
 import { file_prev, file_next } from '../store/modules/dirDuck';
 import { RootState } from '../store/store';
@@ -72,22 +71,24 @@ const MainPage = (props : MainPageProps) => {
         }
     }, [props, started]);
     return (
-        <div>
-            <Row>
-                <SelectDir cookies={ props.cookies }></SelectDir>
-            </Row>
-            <hr></hr>
-            <Row>
-                <Col>
-                    <AnnotateImage></AnnotateImage>
-                    <p></p>
-                    { (props.len_files > 0 && props.cur_file !== undefined) && <ImageNav cookies={props.cookies} /> }
-                </Col>
-                <Col>
-                    { (props.cur_dir !== undefined && props.cur_file !== undefined && props.len_files > 0) && <RightPane/> }
-                </Col>
-            </Row>
-        </div>
+        <>
+            <CssBaseline />
+            <Container maxWidth="lg">
+                <Box sx={{ eight: '100vh' }}>
+                    <Grid container spacing={3}>
+                        <Grid item xs={12}>
+                            <SelectDir cookies={ props.cookies }></SelectDir>
+                        </Grid>
+                        <Grid item lg={6} md={6} minWidth={512}>
+                            <AnnotateImage cookies={props.cookies}></AnnotateImage>
+                        </Grid>
+                        <Grid item lg={6} md={6}>
+                            { (props.cur_dir !== undefined && props.cur_file !== undefined && props.len_files > 0) && <RightPane cookies={props.cookies}/> }
+                        </Grid>
+                    </Grid>
+                </Box>
+            </Container>
+        </>
     )
 }
 

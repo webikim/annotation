@@ -1,7 +1,7 @@
-import React, { ChangeEvent, Children, MouseEventHandler } from 'react';
+import React, { MouseEventHandler } from 'react';
+import { Button, Divider, FormControlLabel, Grid, IconButton, Radio, RadioGroup, Stack } from '@mui/material';
+import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { connect, ConnectedProps } from 'react-redux';
-import { Row, Col } from 'react-bootstrap';
-import { BsXCircleFill } from "react-icons/bs";
 
 import { mark_set, color_set, color_key, landmark_order_set, landmark_order_clear, landmark_clear } from '../store/modules/annoDuck';
 import { RootState } from '../store/store';
@@ -24,43 +24,60 @@ interface LandmarkProps extends PropsFromRedux {
 
 }
 
-const onChangeColor = ({ landmark_order_set }: LandmarkProps) => (e: ChangeEvent<HTMLInputElement>) => {
-    landmark_order_set(parseInt(e.target.value));
-}
-
 const onClickClear = ({ landmark_order_clear }: LandmarkProps, colorkey_order: number): MouseEventHandler<SVGElement> => (e) => {
     landmark_order_clear(colorkey_order);
 }
 
 const Landmark = (props: LandmarkProps) => {
-    let legend = []
-    if (props.cloth_type !== undefined) {
-        for (let i in mark_set[props.cloth_type]) {
-            const color = color_set[mark_set[props.cloth_type][i]];
-            let colorkey = color[0];
-            let colorkey_order: number = color_key.indexOf(colorkey);
-            let color1 = { backgroundColor: color[1], border: 'none' };
-            let color2 = { backgroundColor: color[2], border: 'none' };
-            legend.push(
-                <Row md={4}>
-                    <Col>
-                        <input type="radio" name="mark" value={ colorkey_order } checked={ props.landmark_order === colorkey_order } onChange={ onChangeColor(props)} />
-                        &nbsp;{ colorkey }. { mark_set[props.cloth_type][i] }
-                    </Col>
-                    <Col>
-                        <button style={color1}>visible&nbsp;</button>
-                        <button style={color2}>hidden</button>
-                    </Col>
-                    <Col>
-                        <BsXCircleFill onClick={ onClickClear(props, colorkey_order) }></BsXCircleFill>
-                    </Col>
-                </Row>
-            )
-        }
-    }
+    const { cloth_type, landmark_order, landmark_order_set } = props
     return (
         <>
-            { Children.toArray(legend) }
+            {/* { Children.toArray(legend) } */}
+            <Divider>랜드마크 (Landmarks)</Divider>
+            <Grid container>
+                <Grid item lg={3} sm={4} xs={5}>
+                    <RadioGroup
+                        aria-labelledby="cloth-type-label"
+                        name="cloth_type"
+                        value={landmark_order !== undefined ? landmark_order : -1}
+                        onChange={(evt) => {
+                            landmark_order_set(parseInt(evt.target.value))
+                        }}
+                    >
+                        {mark_set[cloth_type!] && mark_set[cloth_type!].map((each, index) => {
+                            const color = color_set[each];
+                            const colorkey_order: number = color_key.indexOf(color[0]);
+                            return (
+                                <FormControlLabel
+                                    key={index}
+                                    value={colorkey_order}
+                                    control={<Radio />}
+                                    sx={{ height:36 }}
+                                    label={'' + color[0] + '. ' + each} />
+                            )
+                        }) }
+                    </RadioGroup>
+                </Grid>
+                <Grid item lg={3} sm={4} xs={5}>
+                    {mark_set[cloth_type!] && mark_set[cloth_type!].map((each, index) => { 
+                        return (<Stack key={index} direction="row">
+                            <Button sx={{ backgroundColor: color_set[each][1] }}>visible</Button>
+                            <Button sx={{ backgroundColor: color_set[each][2] }}>hidden</Button>
+                        </Stack>)
+                    }) }
+                </Grid>
+                <Grid item xs={1} sm={1}>
+                    <Stack>
+                    {mark_set[cloth_type!] && mark_set[cloth_type!].map((each, index) => { 
+                        return (
+                            <IconButton key={index} aria-label="delete" size="small" sx={{ height: 36 }}>
+                                <HighlightOffIcon></HighlightOffIcon>
+                            </IconButton>
+                        )
+                    }) }
+                    </Stack>
+                </Grid>
+            </Grid>
         </>
     )
 }

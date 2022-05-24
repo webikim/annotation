@@ -11,6 +11,9 @@ const initialstate = {
     },
     anno: {
         status: 0
+    },
+    image: {
+        auto_next: 0
     }
 }
 

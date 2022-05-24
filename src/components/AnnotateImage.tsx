@@ -1,6 +1,7 @@
-import React, { Children, CSSProperties, DragEventHandler, LegacyRef, MouseEvent, useEffect, useRef, useState } from 'react'
-import { BsFillFileEarmarkFill } from "react-icons/bs";
+import React, { Children, CSSProperties, DragEventHandler, LegacyRef, MouseEvent, MouseEventHandler, useEffect, useRef, useState } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
+import { Stack, TextField } from '@mui/material';
+import { grey } from '@mui/material/colors';
 
 import { encodeQueryData } from '../common/ajax';
 import { API_IMG_GET } from '../common/urls';
@@ -8,6 +9,7 @@ import { bbox_set, color_set, landmark_set } from '../store/modules/annoDuck';
 import { file_set } from '../store/modules/dirDuck';
 import { RootState } from '../store/store';
 import { BBoxType, Position } from '../typings';
+import { Cookies } from 'react-cookie';
 
 const mapStateToProps = (state: RootState) => ({
     bbox: state.anno.bbox,
@@ -30,7 +32,7 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 interface AnnotateImageProp extends PropsFromRedux {
-
+    cookies: Cookies
 }
 
 const onClickHandle = ({ landmark_set, landmark_order }: AnnotateImageProp) => (e: MouseEvent) => {
@@ -99,6 +101,20 @@ const onClickSearch = (props: AnnotateImageProp) => (e: MouseEvent<HTMLInputElem
             alert('파일을 찾을 수 없습니다.')
     }
     e.currentTarget.blur();
+}
+
+const onClickValue = ({ files, file_set, cookies, cur_dir }: AnnotateImageProp): MouseEventHandler<HTMLInputElement> => (e) => {
+    if (files && cur_dir) {
+        let value = prompt("이동할 번호를 입력하세요:", (e.target as HTMLInputElement).value);
+        if (value) {
+            const page = parseInt(value) - 1;
+            if (page >= 0 && page < files.length) {
+                file_set(page);
+                cookies.set(cur_dir, page);
+            }
+        }
+    }
+    (e.target as HTMLInputElement).blur();
 }
 
 const onDragTop = (bbox: BBoxType, pos: Position, bbox_set: (bbox: object)=> void): DragEventHandler<HTMLImageElement> => (e) => {
@@ -182,11 +198,37 @@ const AnnotateImage = (props: AnnotateImageProp) => {
         const file = files[cur_file];
         return (
             <>
-                <p style={{ fontWeight: 700 }}><BsFillFileEarmarkFill></BsFillFileEarmarkFill> 파일명 (filename) :&nbsp; 
+                <Stack direction='row'>
+                <TextField
+                    margin="normal"
+                    size='small'
+                    name="filename"
+                    sx={{ width: 420 }}
+                    label="파일명 (filename)"
+                    id="filename"
+                    value={file}
+                />
+                <TextField
+                    margin="normal"
+                    size='small'
+                    name="filename"
+                    sx={{ width: 92 }}
+                    label="번호 (No.)"
+                    id="filename"
+                    value={file}
+                />
+                </Stack>
+                {/* <p style={{ fontWeight: 700 }}> 파일명 (filename) :&nbsp; 
                     <input style={{ border: '2px solid #ced4da', padding: '1px 2px', borderRadius: '3px' }}
                         type='text' value={file} onClick={onClickSearch(props)} onChange={(e) => { }}></input>
-                </p>
-                <div ref={ ref as LegacyRef<HTMLDivElement> } >
+                </p> */}
+                <div ref={ref as LegacyRef<HTMLDivElement>}
+                    style={{
+                        width: 512,
+                        height: 512,
+                        backgroundColor: grey[100],
+                        border: '1px solid lightgrey'
+                    }} >
                     <img alt='annotation target' draggable='false'
                         src={API_IMG_GET + '?' + encodeQueryData({ 'path': '' + props.cur_dir, 'name': '' + file })}
                             onClick={ onClickHandle(props) }

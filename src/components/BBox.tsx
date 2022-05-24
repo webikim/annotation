@@ -1,4 +1,6 @@
-import React, { ChangeEvent, MouseEventHandler } from 'react'
+import { Checkbox, Divider, FormControlLabel, Typography } from '@mui/material'
+import { red } from '@mui/material/colors'
+import React, { MouseEventHandler } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 
 import { bbox_set, bbox_show_set, bbox_update_set, decode_ai_label, get_bbox } from '../store/modules/annoDuck'
@@ -37,37 +39,54 @@ const onClickUseFull = ({ bbox_set, label }: BBoxProps): MouseEventHandler<HTMLD
     }
 }
 
-const onChangeBBox = ({ bbox_show_set }: BBoxProps, value: number) => (e: ChangeEvent) => {
-    bbox_show_set(value === 1 ? 0 : 1);
-}
-
-const onChangeUpdate = ({ bbox_update_set, bbox_show_set }: BBoxProps, value: number) => (e: ChangeEvent) => {
-    bbox_update_set(value === 1 ? 0 : 1)
-    if (value !== 1)
-        bbox_show_set(1);
-}
-
 const BBox = (props: BBoxProps) => {
-    const bbox_show = props.bbox_show || 0;
-    const bbox_update = props.bbox_update || 0;
-    if (props.bbox !== undefined && Object.keys(props.bbox).length) {
+    const { bbox, bbox_show, bbox_show_set, bbox_update, bbox_update_set, cloth_type, label } = props
+    if (bbox !== undefined && Object.keys(bbox).length) {
         return (
             <>
-                <label>
-                    <input type='checkbox' checked={ props.bbox_show === 1 } onChange={ onChangeBBox(props, bbox_show) }/> b. 박스 보기 (BBox show)
-                </label>
-                <label>
-                    <input type='checkbox' checked={ props.bbox_update === 1 } onChange={ onChangeUpdate(props, bbox_update) }/> 박스 수정하기 (BBox update)
-                </label>
+                <Divider>바운딩 박스</Divider>
+                <FormControlLabel
+                    label="b. 바운딩 박스 보기 (View BBox)"
+                    sx={{ height: 0 }}
+                    control={
+                        <Checkbox
+                            checked={bbox_show === 1}
+                            onChange={(evt) => {
+                                bbox_show_set(bbox_show === 1 ? 0 : 1)
+                            }}
+                        />
+                    }
+                />
+                <FormControlLabel
+                    label=" 바운딩 박스 수정 (Edit BBox"
+                    sx={{ height: 1 }}
+                    control={
+                        <Checkbox
+                            checked={bbox_update === 1}
+                            onChange={(evt) => {
+                                bbox_update_set(bbox_update === 1 ? 0 : 1)
+                                if (bbox_update !== 1)
+                                    bbox_show_set(1)
+                            }}
+                        />
+                    }
+                />
             </>
         )
     } else {
-        if (props.label !== undefined && (props.label as LabelType)['이미지 정보'] && props.cloth_type === 'upper') {
-            const ai_bbox = decode_ai_label(props.label, 'full');
+        if (label !== undefined && (label as LabelType)['이미지 정보'] && cloth_type === 'upper') {
+            const ai_bbox = decode_ai_label(label, 'full');
             if (ai_bbox !== undefined && ai_bbox.length > 0)
                 return <div style={{ fontWeight: 700, marginTop: '10px', backgroundColor: 'magenta' }} onClick={ onClickUseFull(props) }>- 전체 박스 사용 (Use bounding box from full) -</div>
         }
-        return <div style={{ fontWeight: 700, marginTop: '10px', backgroundColor: 'magenta' }}>- 박스 없음 (No bounding box in data) -</div>
+        return (
+            <>
+                <Divider>바운딩 박스</Divider>
+                <Typography sx={{ textAlign: 'center', fontWeight: 700, marginTop: '10px', backgroundColor: red[300] }}>
+                    박스 없음 (No bounding box in data)
+                </Typography>
+            </>
+        )
     }
 }
 

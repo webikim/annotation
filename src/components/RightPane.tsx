@@ -1,16 +1,19 @@
-import React, { ChangeEventHandler } from 'react';
-import { Row } from 'react-bootstrap';
-import { BsStopFill } from 'react-icons/bs';
+import React, { } from 'react';
 import { connect, ConnectedProps } from 'react-redux';
-import { image_auto_next } from '../store/modules/annoDuck';
+import { Cookies } from 'react-cookie';
+
+import { Checkbox, FormControlLabel, Grid, Stack } from '@mui/material';
+
+import { image_auto_next } from '../store/modules/imageDuck';
 import { RootState } from '../store/store';
 import BBox from './BBox';
 import ClothType from './ClothType';
 import ClothVaried from './ClothVaried';
+import ImageNav from './ImageNav';
 import Landmark from './Landmark';
 
 const mapStateToProps = (state: RootState) => ({
-    auto_next: state.anno.auto_next
+    auto_next: state.image.auto_next
 })
 
 const mapDispatchToProps = {
@@ -21,50 +24,40 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 type PropsFromRedux = ConnectedProps<typeof connector>;
 
 interface RightPanceProps extends PropsFromRedux {
-
-}
-
-const onChangeAutoNext = ({ image_auto_next, auto_next }: RightPanceProps): ChangeEventHandler<HTMLInputElement> => (e) => {
-    image_auto_next(auto_next === 1 ? 0 : 1);
+    cookies: Cookies
 }
 
 const RightPane = (props: RightPanceProps) => {
+    const { auto_next, cookies, image_auto_next } = props
     return (
         <>
-            <Row>
-                <label>
-                    <input type='checkbox' checked={ props.auto_next === 1 } onChange={ onChangeAutoNext(props) }></input> 저장하면 다음으로 (move next when save)
-                </label>
-            </Row>
-            <p></p>
-            <Row>
-                <span><BsStopFill></BsStopFill> 옷 종류 (Cloth type)</span>
-                <hr></hr>
+            <div style={{ height: 520 }}>
+            <Stack sx={{ marginTop: 1 }} spacing={2} >
                 <ClothType></ClothType>
-            </Row>
-            <p></p>
-            <Row>
-                <span><BsStopFill></BsStopFill> 랜드마크 (Landmark)</span>
-                <hr></hr>
                 <Landmark></Landmark>
-            </Row>
-            <p></p>
-            <Row>
-                <span><BsStopFill></BsStopFill> 바운딩 박스 (Bounding Box)</span>
-                <hr></hr>
-                <BBox></BBox>
-            </Row>
-            <p></p>
-            <Row>
-                <span><BsStopFill></BsStopFill> 자세 변형 정도 (Variation)</span>
-                <hr></hr>
                 <ClothVaried></ClothVaried>
-            </Row>
-            <p></p>
-            <Row>
-                <span><BsStopFill></BsStopFill> AI-Hub 데이터 (base data)</span>
-                <hr></hr>
-            </Row>
+                <BBox></BBox>
+            </Stack>
+            </div>
+            <Grid container spacing={3}>
+                <Grid item lg={11}>
+                    <ImageNav cookies={cookies}></ImageNav>
+                </Grid>
+                <Grid item lg={1}>
+                    <FormControlLabel
+                        label="Auto"
+                        sx={{ height: 0 }}
+                        control={
+                            <Checkbox
+                                checked={auto_next === 1}
+                                onChange={(evt) => {
+                                    image_auto_next(auto_next === 1 ? 0 : 1);
+                                }}
+                            />
+                        }
+                    />
+                </Grid>
+            </Grid>
         </>
     )
 }

@@ -1,11 +1,10 @@
-import React, { ChangeEvent, Children } from 'react'
+import React from 'react'
 import { connect, ConnectedProps } from 'react-redux'
-import { Col, Row } from 'react-bootstrap';
 import { Cookies } from 'react-cookie';
-import { BsFolder2Open } from "react-icons/bs";
 
 import { dir_list, dir_set, file_set } from '../store/modules/dirDuck';
 import { RootState } from '../store/store';
+import { MenuItem, TextField } from '@mui/material';
 
 const mapStateToProps = (state : RootState) => ({
     dirs: state.dir.dirs
@@ -23,39 +22,37 @@ type PropsFromRedux = ConnectedProps<typeof connector>
 interface SelectDirProps extends PropsFromRedux {
     cookies: Cookies
 }
- 
-const onChangeHandle = ({ dir_set, file_set, cookies }: SelectDirProps) => (e : ChangeEvent<HTMLSelectElement>) => {
-    dir_set(e.target.value);
-    file_set(parseInt(cookies.get(e.target.value) || 0));
-    e.target.blur();
-}
 
 const SelectDir = (props: SelectDirProps) => {
-    const { dirs } = props;
+    const { dirs, dir_set, file_set, cookies } = props;
+
     if (dirs === undefined) {
         props.dir_list();
         return ( <></> );
     }
-    let dir_elem = [];
-    dir_elem.push(
-        <option data-testid='select-option' value='.'>./</option>
-    )
-    dirs.map((each) => 
-        dir_elem.push(
-            <option data-testid='select-option' value={each}>./{ each }</option>
-        )
-    )
     return (
-        <Row style={{ marginTop: '10px' }}>
-            <Col sm={2}>
-                <span style={{ fontWeight: 700 }}><BsFolder2Open></BsFolder2Open>&nbsp; 작업 위치 (Location)</span>
-            </Col>
-            <Col sm={10}>
-                <select style={{ width: '100%'}} onChange={ onChangeHandle(props) } data-testid='select'>
-                    { Children.toArray(dir_elem) }
-                </select>
-            </Col>
-        </Row>
+        <TextField
+            size='small'
+            label="작업위치 (Work location)"
+            fullWidth
+            sx={{ mt: 3 }}
+            select
+            defaultValue=""
+            // value={personName}
+            onChange={(evt) => {
+                dir_set(evt.target.value);
+                file_set(parseInt(cookies.get(evt.target.value) || 0));
+            }}
+        >
+            <MenuItem value="">
+                <em>None</em>
+            </MenuItem>
+            {dirs.map((name) => (
+            <MenuItem key={name} value={name}>
+                {name}
+            </MenuItem>
+            ))}
+        </TextField>
     );
 }
    

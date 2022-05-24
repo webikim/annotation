@@ -1,6 +1,7 @@
-import React, { ChangeEvent } from 'react'
+import React from 'react'
 import { connect, ConnectedProps } from 'react-redux'
-import { Row, Col } from 'react-bootstrap';
+
+import { Divider, FormControl, FormControlLabel, Radio, RadioGroup } from '@mui/material';
 
 import { cloth_type_set } from '../store/modules/annoDuck';
 import { RootState } from '../store/store';
@@ -20,27 +21,28 @@ interface ClothTypeProps extends PropsFromRedux {
 
 }
 
-const onChangeCloth = ({ cloth_type_set }: ClothTypeProps) => (e: ChangeEvent<HTMLInputElement>) => {
-    cloth_type_set(e.target.value);
-}
-
 const ClothType = (props: ClothTypeProps) => {
+    const { cloth_type, cloth_type_set } = props
     return (
-        <Row md={4}>
-            <Col>
-                <input type="radio" name="cloth_type" value="upper" checked={ props.cloth_type === 'upper' } onChange={ onChangeCloth(props)} />
-                <label>&nbsp;1. 상의</label>
-            </Col>
-            <Col>
-                <input type="radio" name="cloth_type" value="lower" checked={ props.cloth_type === 'lower' } onChange={ onChangeCloth(props)}  />
-                <label>&nbsp;2. 하의</label>
-            </Col>
-            <Col>
-                <input type="radio" name="cloth_type" value="full" checked={ props.cloth_type === 'full' } onChange={ onChangeCloth(props)}  />
-                <label>&nbsp;3. 전체</label>
-            </Col>
-        </Row>
-    )
+        <>
+            <FormControl>
+                <Divider sx={{ marginBottom: 1 }}>옷 종류 (Cloth type)</Divider>
+                <RadioGroup
+                    row
+                    aria-labelledby="cloth-type-label"
+                    name="cloth_type"
+                    value={cloth_type || ""}
+                    onChange={(evt) => {
+                        cloth_type_set(evt.target.value);
+                    }}
+                >
+                    <FormControlLabel value="upper" control={<Radio />} label="1. 상의 (Upper)" />
+                    <FormControlLabel value="lower" control={<Radio />} label="2. 하의 (lower)" />
+                    <FormControlLabel value="full" control={<Radio />} label="3. 전체 (full)" />
+                </RadioGroup>
+            </FormControl>
+        </>
+   )
 }
 
 export default connector(ClothType)
