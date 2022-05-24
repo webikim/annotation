@@ -3,8 +3,8 @@ import { connect, ConnectedProps } from 'react-redux'
 
 import { Divider, FormControl, FormControlLabel, Radio, RadioGroup } from '@mui/material';
 
-import { cloth_type_set } from '../store/modules/annoDuck';
-import { RootState } from '../store/store';
+import { cloth_type_set } from '../../store/anno/annoDuck';
+import { RootState } from '../../store/store';
 
 const mapStateToProps = (state: RootState) => ({
     cloth_type: state.anno.cloth_type

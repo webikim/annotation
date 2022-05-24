@@ -1,7 +1,7 @@
 import { fireEvent, render, screen } from "@testing-library/react";
 import createMockStore from "redux-mock-store"
 import thunk from "redux-thunk";
-import { CLOTH_VARIED_SET } from "../store/modules/annoDuck";
+import { CLOTH_VARIED_SET } from "../../store/anno/annoDuck";
 import ClothVaried from "./ClothVaried";
 
 const middleware = [thunk]

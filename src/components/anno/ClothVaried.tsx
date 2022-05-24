@@ -1,8 +1,8 @@
 import { Divider, FormControl, FormControlLabel, Radio, RadioGroup } from '@mui/material';
 import { connect, ConnectedProps } from 'react-redux';
 
-import { cloth_varied_set } from '../store/modules/annoDuck';
-import { RootState } from '../store/store';
+import { cloth_varied_set } from '../../store/anno/annoDuck';
+import { RootState } from '../../store/store';
 
 const mapStateToProps = (state: RootState) => ({
     cloth_varied: state.anno.cloth_varied

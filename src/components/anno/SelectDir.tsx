@@ -2,8 +2,8 @@ import React from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 import { Cookies } from 'react-cookie';
 
-import { dir_list, dir_set, file_set } from '../store/modules/dirDuck';
-import { RootState } from '../store/store';
+import { dir_list, dir_set, file_set } from '../../store/anno/dirDuck';
+import { RootState } from '../../store/store';
 import { MenuItem, TextField } from '@mui/material';
 
 const mapStateToProps = (state : RootState) => ({

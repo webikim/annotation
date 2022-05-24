@@ -4,8 +4,8 @@ import { Cookies } from 'react-cookie';
 
 import { Checkbox, FormControlLabel, Grid, Stack } from '@mui/material';
 
-import { image_auto_next } from '../store/modules/imageDuck';
-import { RootState } from '../store/store';
+import { image_auto_next } from '../../store/anno/imageDuck';
+import { RootState } from '../../store/store';
 import BBox from './BBox';
 import ClothType from './ClothType';
 import ClothVaried from './ClothVaried';

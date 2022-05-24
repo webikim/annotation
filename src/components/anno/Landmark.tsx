@@ -3,8 +3,8 @@ import { Button, Divider, FormControlLabel, Grid, IconButton, Radio, RadioGroup,
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { connect, ConnectedProps } from 'react-redux';
 
-import { mark_set, color_set, color_key, landmark_order_set, landmark_order_clear, landmark_clear } from '../store/modules/annoDuck';
-import { RootState } from '../store/store';
+import { mark_set, color_set, color_key, landmark_order_set, landmark_order_clear, landmark_clear } from '../../store/anno/annoDuck';
+import { RootState } from '../../store/store';
 
 const mapStateToProps = (state: RootState) => ({
     cloth_type: state.anno.cloth_type,

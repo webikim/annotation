@@ -2,12 +2,12 @@ import { Box, Container, CssBaseline, Grid } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Cookies } from 'react-cookie';
 import { connect, ConnectedProps } from 'react-redux';
-import AnnotateImage from '../components/AnnotateImage';
-import RightPane from '../components/RightPane';
-import SelectDir from '../components/SelectDir';
+import AnnotateImage from '../components/anno/AnnotateImage';
+import RightPane from '../components/anno/RightPane';
+import SelectDir from '../components/anno/SelectDir';
 
-import { cloth_type_set, landmark_order_set, cloth_save, cloth_varied_set, bbox_show_toggle, mark_set, color_key } from '../store/modules/annoDuck';
-import { file_prev, file_next } from '../store/modules/dirDuck';
+import { cloth_type_set, landmark_order_set, cloth_save, cloth_varied_set, bbox_show_toggle, mark_set, color_key } from '../store/anno/annoDuck';
+import { file_prev, file_next } from '../store/anno/dirDuck';
 import { RootState } from '../store/store';
 
 const mapStateToProps = (state: RootState) => {

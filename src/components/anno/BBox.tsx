@@ -3,9 +3,9 @@ import { red } from '@mui/material/colors'
 import React, { MouseEventHandler } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 
-import { bbox_set, bbox_show_set, bbox_update_set, decode_ai_label, get_bbox } from '../store/modules/annoDuck'
-import { RootState } from '../store/store'
-import { LabelType } from '../typings'
+import { bbox_set, bbox_show_set, bbox_update_set, decode_ai_label, get_bbox } from '../../store/anno/annoDuck'
+import { RootState } from '../../store/store'
+import { LabelType } from '../../typings'
 
 const mapStateToProps = (state: RootState) => ({
     bbox_show: state.anno.bbox_show,

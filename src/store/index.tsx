@@ -1,8 +1,8 @@
 import { combineReducers } from '@reduxjs/toolkit';
 
-import annoDuck from './modules/annoDuck';
-import dirDuck from './modules/dirDuck';
-import imageDuck from './modules/imageDuck';
+import annoDuck from './anno/annoDuck';
+import dirDuck from './anno/dirDuck';
+import imageDuck from './anno/imageDuck';
 
 const rootReducer = combineReducers(
     {

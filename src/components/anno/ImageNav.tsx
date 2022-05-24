@@ -6,10 +6,10 @@ import { Button, IconButton, Stack } from '@mui/material';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 
-import { file_prev, file_next } from '../store/modules/dirDuck';
-import { cloth_save, cloth_delete, clear_status } from '../store/modules/annoDuck';
+import { file_prev, file_next } from '../../store/anno/dirDuck';
+import { cloth_save, cloth_delete, clear_status } from '../../store/anno/annoDuck';
 import { Cookies } from 'react-cookie';
-import { RootState } from '../store/store';
+import { RootState } from '../../store/store';
 import { red } from '@mui/material/colors';
 
 const mapStateToProps = (state: RootState) => ({

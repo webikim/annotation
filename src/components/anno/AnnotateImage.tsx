@@ -1,14 +1,13 @@
 import React, { Children, CSSProperties, DragEventHandler, LegacyRef, MouseEvent, MouseEventHandler, useEffect, useRef, useState } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 import { Stack, TextField } from '@mui/material';
-import { grey } from '@mui/material/colors';
 
-import { encodeQueryData } from '../common/ajax';
-import { API_IMG_GET } from '../common/urls';
-import { bbox_set, color_set, landmark_set } from '../store/modules/annoDuck';
-import { file_set } from '../store/modules/dirDuck';
-import { RootState } from '../store/store';
-import { BBoxType, Position } from '../typings';
+import { encodeQueryData } from '../../common/ajax';
+import { API_IMG_GET } from '../../common/urls';
+import { bbox_set, color_set, landmark_set } from '../../store/anno/annoDuck';
+import { file_set } from '../../store/anno/dirDuck';
+import { RootState } from '../../store/store';
+import { BBoxType, Position } from '../../typings';
 import { Cookies } from 'react-cookie';
 
 const mapStateToProps = (state: RootState) => ({
@@ -39,7 +38,7 @@ const onClickHandle = ({ landmark_set, landmark_order }: AnnotateImageProp) => (
     const rect = (e.target as HTMLImageElement).getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
-    console.log('..... rect : ', rect, ', x: ', x, ', y: ', y)
+    // console.log('..... rect : ', rect, ', x: ', x, ', y: ', y)
     if (landmark_order !== undefined)
         landmark_set(landmark_order, 0, x, y);
 }
@@ -226,7 +225,7 @@ const AnnotateImage = (props: AnnotateImageProp) => {
                     style={{
                         width: 512,
                         height: 512,
-                        backgroundColor: grey[100],
+                        backgroundColor: 'white',
                         border: '1px solid lightgrey'
                     }} >
                     <img alt='annotation target' draggable='false'
