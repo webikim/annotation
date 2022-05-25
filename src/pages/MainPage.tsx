@@ -64,12 +64,27 @@ const onKeyPressHandler = (props: MainPageProps) => (e: KeyboardEvent) => {
 
 const MainPage = (props : MainPageProps) => {
     const [started, setStarted] = useState(false);
+    const [winSize, setWinSize] = useState({
+        width: 0,
+        height: 0
+    })
     useEffect(() => {
         if (!started) {
             window.onkeydown = onKeyPressHandler(props);
             setStarted(true);
         }
-    }, [props, started]);
+        const handleResize = () => {
+            setWinSize({
+                width: window.innerWidth,
+                height: window.innerHeight
+            });
+        }
+        window.addEventListener("resize", handleResize);
+        handleResize();
+        return () => {
+            window.removeEventListener("resize", handleResize);
+        }
+    }, [props, started, winSize.width]);
     return (
         <>
             <CssBaseline />
@@ -80,7 +95,7 @@ const MainPage = (props : MainPageProps) => {
                             <SelectDir cookies={ props.cookies }></SelectDir>
                         </Grid>
                         <Grid item lg={6} md={6} minWidth={512}>
-                            <AnnotateImage cookies={props.cookies}></AnnotateImage>
+                            <AnnotateImage cookies={props.cookies} redraw={winSize.width + winSize.height}></AnnotateImage>
                         </Grid>
                         <Grid item lg={6} md={6}>
                             { (props.cur_dir !== undefined && props.cur_file !== undefined && props.len_files > 0) && <RightPane cookies={props.cookies}/> }

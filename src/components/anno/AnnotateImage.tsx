@@ -31,7 +31,8 @@ const connector = connect(mapStateToProps, mapDispatchToProps);
 type PropsFromRedux = ConnectedProps<typeof connector>
 
 interface AnnotateImageProp extends PropsFromRedux {
-    cookies: Cookies
+    cookies: Cookies,
+    redraw?: number
 }
 
 const onClickHandle = ({ landmark_set, landmark_order }: AnnotateImageProp) => (e: MouseEvent) => {
@@ -191,6 +192,7 @@ const AnnotateImage = (props: AnnotateImageProp) => {
         if (ref.current) {
             const bbox = (ref.current as HTMLImageElement).getBoundingClientRect();
             setPos({ top: bbox.top, left: bbox.left });
+
         }
     }, [props])
     if (files !== undefined && files.length > 0 && cur_file !== undefined) {
@@ -214,7 +216,8 @@ const AnnotateImage = (props: AnnotateImageProp) => {
                     sx={{ width: 92 }}
                     label="번호 (No.)"
                     id="filename"
-                    value={file}
+                    inputProps={{min: 0, style: { textAlign: 'center' }}}
+                    value={(props.cur_file || 0) + 1}
                 />
                 </Stack>
                 {/* <p style={{ fontWeight: 700 }}> 파일명 (filename) :&nbsp; 

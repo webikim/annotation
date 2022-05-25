@@ -1,6 +1,5 @@
-import { Checkbox, Divider, FormControlLabel, Typography } from '@mui/material'
-import { red } from '@mui/material/colors'
-import React, { MouseEventHandler } from 'react'
+import { Checkbox, Divider, FormControlLabel, styled, Typography } from '@mui/material'
+import React, { } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 
 import { bbox_set, bbox_show_set, bbox_update_set, decode_ai_label, get_bbox } from '../../store/anno/annoDuck'
@@ -28,19 +27,27 @@ interface BBoxProps extends PropsFromRedux {
 
 }
 
-const onClickUseFull = ({ bbox_set, label }: BBoxProps): MouseEventHandler<HTMLDivElement> => (e) => {
-    if (label !== undefined) {
-        const ai_bbox = decode_ai_label(label, 'full');
-        if (ai_bbox !== undefined) {
-            const bbox = get_bbox(label as LabelType, ai_bbox);
-            if (bbox !== undefined)
-                bbox_set(bbox);
-        }
+const WarnTypography = styled(Typography)(({ theme }) => ({
+    '&': {
+        textAlign: 'center',
+        fontWeight: 700,
+        marginTop: '10px',
+        backgroundColor: theme.palette.error.light
     }
-}
+}));
 
 const BBox = (props: BBoxProps) => {
-    const { bbox, bbox_show, bbox_show_set, bbox_update, bbox_update_set, cloth_type, label } = props
+    const { bbox, bbox_set, bbox_show, bbox_show_set, bbox_update, bbox_update_set, cloth_type, label } = props
+    const handleClickUseFull = () => {
+        if (label !== undefined) {
+            const ai_bbox = decode_ai_label(label, 'full');
+            if (ai_bbox !== undefined) {
+                const bbox = get_bbox(label as LabelType, ai_bbox);
+                if (bbox !== undefined)
+                    bbox_set(bbox);
+            }
+        }
+    }
     if (bbox !== undefined && Object.keys(bbox).length) {
         return (
             <>
@@ -77,14 +84,21 @@ const BBox = (props: BBoxProps) => {
         if (label !== undefined && (label as LabelType)['이미지 정보'] && cloth_type === 'upper') {
             const ai_bbox = decode_ai_label(label, 'full');
             if (ai_bbox !== undefined && ai_bbox.length > 0)
-                return <div style={{ fontWeight: 700, marginTop: '10px', backgroundColor: 'magenta' }} onClick={ onClickUseFull(props) }>- 전체 박스 사용 (Use bounding box from full) -</div>
+                return (
+                    <>
+                        <Divider>바운딩 박스</Divider>
+                        <WarnTypography onClick = { handleClickUseFull }>
+                            전체 박스 사용(Use bounding box from full)
+                        </WarnTypography>
+                    </>
+                )
         }
         return (
             <>
                 <Divider>바운딩 박스</Divider>
-                <Typography sx={{ textAlign: 'center', fontWeight: 700, marginTop: '10px', backgroundColor: red[300] }}>
+                <WarnTypography>
                     박스 없음 (No bounding box in data)
-                </Typography>
+                </WarnTypography>
             </>
         )
     }
