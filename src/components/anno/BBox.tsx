@@ -65,7 +65,7 @@ const BBox = (props: BBoxProps) => {
                     }
                 />
                 <FormControlLabel
-                    label=" 바운딩 박스 수정 (Edit BBox"
+                    label=" 바운딩 박스 수정 (Edit BBox)"
                     sx={{ height: 1 }}
                     control={
                         <Checkbox

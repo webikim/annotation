@@ -7,13 +7,14 @@ import { RootState } from '../../store/store';
 import { MenuItem, TextField } from '@mui/material';
 
 const mapStateToProps = (state : RootState) => ({
-    dirs: state.dir.dirs
+    dirs: state.dir.dirs,
+    cur_dir: state.dir.cur_dir
 })
 
 const mapDispatchToProps = {
-        dir_list,
-        dir_set,
-        file_set 
+    dir_list,
+    dir_set,
+    file_set 
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -37,8 +38,7 @@ const SelectDir = (props: SelectDirProps) => {
             fullWidth
             sx={{ mt: 3 }}
             select
-            defaultValue=""
-            // value={personName}
+            value={props.cur_dir || ''}
             onChange={(evt) => {
                 dir_set(evt.target.value);
                 file_set(parseInt(cookies.get(evt.target.value) || 0));

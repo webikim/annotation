@@ -1,13 +1,13 @@
 import React, { Children, CSSProperties, DragEventHandler, LegacyRef, MouseEvent, MouseEventHandler, useEffect, useRef, useState } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
-import { Stack, TextField } from '@mui/material';
+import { Stack, styled, TextField } from '@mui/material';
 
 import { encodeQueryData } from '../../common/ajax';
 import { API_IMG_GET } from '../../common/urls';
 import { bbox_set, color_set, landmark_set } from '../../store/anno/annoDuck';
 import { file_set } from '../../store/anno/dirDuck';
 import { RootState } from '../../store/store';
-import { BBoxType, Position } from '../../typings';
+import { Position } from '../../typings';
 import { Cookies } from 'react-cookie';
 
 const mapStateToProps = (state: RootState) => ({
@@ -34,6 +34,16 @@ interface AnnotateImageProp extends PropsFromRedux {
     cookies: Cookies,
     redraw?: number
 }
+
+const MarkImg = styled('img')(({ theme }) => ({
+    '&': {
+        width: '9px',
+        height: '9px',
+        border: '3px solid black',
+        position: 'absolute',
+        objectFit: 'fill',
+    }
+}));
 
 const onClickHandle = ({ landmark_set, landmark_order }: AnnotateImageProp) => (e: MouseEvent) => {
     const rect = (e.target as HTMLImageElement).getBoundingClientRect();
@@ -117,84 +127,108 @@ const onClickValue = ({ files, file_set, cookies, cur_dir }: AnnotateImageProp):
     (e.target as HTMLInputElement).blur();
 }
 
-const onDragTop = (bbox: BBoxType, pos: Position, bbox_set: (bbox: object)=> void): DragEventHandler<HTMLImageElement> => (e) => {
-    if (e.pageX !== 0 && e.pageY !== 0) {
-        const moveX = bbox.x - (e.pageX - pos.left);
-        const moveY = bbox.y - (e.pageY - pos.top);
-        bbox_set({x: bbox.x - moveX, y: bbox.y - moveY, width: bbox.width + moveX, height: bbox.height + moveY});
-    }
-    e.preventDefault();
-}
 
-const onDragDown = (bbox: BBoxType, pos: Position, bbox_set: (bbox: object)=> void): DragEventHandler<HTMLImageElement> => (e) => {
-    if (e.pageX !== 0 && e.pageY !== 0) {
-        const moveX = bbox.x + bbox.width - (e.pageX - pos.left);
-        const moveY = bbox.y + bbox.height - (e.pageY -pos.top);
-        bbox_set({x: bbox.x, y: bbox.y, width: bbox.width - moveX, height: bbox.height - moveY});
-    }
-    e.preventDefault();
-}
+const AnnotateImage = (props: AnnotateImageProp) => {
+    const { bbox, bbox_show, bbox_update, bbox_set, cur_file, files } = props;
+    const [offset, setOffset] = useState({ top: 0, left: 0})
+    const [moved, setMoved] = useState({ top: 0, left: 0, bottom: 0, right: 0 })
+    const ref = useRef<HTMLElement>();
 
-const render_bbox = ({ bbox, bbox_show, bbox_update  }: AnnotateImageProp, pos: Position) => {
-    if (bbox !== undefined && Object.keys(bbox).length > 0 && bbox_show) {
-        let bbox_style: CSSProperties = {
-            border: '2px solid darkgray',
-            position: 'absolute',
-            top: (pos.top + bbox.y) + 'px',
-            left: (pos.left + bbox.x) + 'px',
-            width: bbox.width + 'px',
-            height: bbox.height + 'px'
+    useEffect(() => {
+        if (ref.current) {
+            const box = (ref.current as HTMLImageElement).getBoundingClientRect();
+            setOffset({ top: box.top, left: box.left });
         }
-        let update_box = (<></>)
-        if (bbox_update) {
-            const top_update: CSSProperties = {
-                width: '9px',
-                height: '9px',
-                border: '3px solid black',
+    }, [props])
+
+    const onDragTop: React.DragEventHandler<HTMLImageElement> = (e) => {
+        if (bbox !== undefined && e.pageX !== 0 && e.pageY !== 0) {
+            const moveX = e.pageX - offset.left - bbox.x;
+            const moveY = e.pageY - offset.top - bbox.y;
+            setMoved({ top: moveY, left: moveX, bottom: 0, right: 0 });
+        }
+        e.preventDefault();
+    }
+
+    const onDragDown: React.DragEventHandler<HTMLImageElement> = (e) => {
+        if (bbox !== undefined && e.pageX !== 0 && e.pageY !== 0) {
+            const moveX = e.pageX - offset.left - bbox.x - bbox.width;
+            const moveY = e.pageY - offset.top - bbox.y - bbox.height;
+            setMoved({ top: 0, left: 0, bottom: moveY, right: moveX });
+        }
+        e.preventDefault();
+    }
+
+    const onDragEnter: React.DragEventHandler<HTMLImageElement> = (e) => {
+        (e.target as HTMLIFrameElement).style.cursor = 'move'
+    }
+
+    const onDragLeave : React.DragEventHandler<HTMLImageElement> = (e) => {
+        if (bbox !== undefined) {
+            bbox_set({
+                x: bbox.x + moved.left,
+                y: bbox.y + moved.top,
+                width: bbox.width + (moved.right - moved.left),
+                height: bbox.height + (moved.bottom - moved.top)
+            });
+            setMoved({ top: 0, left: 0, bottom: 0, right: 0 })
+        }
+        (e.target as HTMLIFrameElement).style.cursor = 'default'
+        e.preventDefault();
+    }
+
+    const render_bbox = () => {
+        if (bbox !== undefined && Object.keys(bbox).length > 0 && bbox_show) {
+            let bbox_style: CSSProperties = {
+                border: '2px solid darkgray',
                 position: 'absolute',
-                objectFit: 'fill',
-                top: (pos.top + bbox.y - 4) + 'px',
-                left: (pos.left + bbox.x - 4) + 'px'
+                top: (offset.top + moved.top + bbox.y) + 'px',
+                left: (offset.left + moved.left + bbox.x) + 'px',
+                width: bbox.width + (moved.right - moved.left) + 'px',
+                height: bbox.height + (moved.bottom - moved.top) + 'px'
             }
-            const bottom_update: CSSProperties = {
-                width: '9px',
-                height: '9px',
-                border: '3px solid black',
-                position: 'absolute',
-                objectFit: 'fill',
-                top: (pos.top + bbox.y + bbox.height - 6) + 'px',
-                left: (pos.left + bbox.x + bbox.width - 6) + 'px'
+            let update_box = (<></>)
+            if (bbox_update) {
+                const top_update: CSSProperties = {
+                    top: (offset.top + moved.top + bbox.y - 4) + 'px',
+                    left: (offset.left + moved.left + bbox.x - 4) + 'px'
+                }
+                const bottom_update: CSSProperties = {
+                    top: (offset.top + moved.bottom + bbox.y + bbox.height - 6) + 'px',
+                    left: (offset.left + moved.right + bbox.x + bbox.width - 6) + 'px'
+                }
+                console.log('... render ...')
+                update_box = (
+                    <>
+                        <MarkImg
+                            alt='top box'
+                            style={top_update}
+                            src='static/33.jpg'
+                            onDrag={onDragTop}
+                            onDragEnter={ onDragEnter }
+                            onDragLeave={onDragLeave}></MarkImg>
+                        <MarkImg
+                            alt='bottom box'
+                            style={bottom_update}
+                            src='static/33.jpg'
+                            onDrag={onDragDown}
+                            onDragEnter={ onDragEnter }
+                            onDragLeave={onDragLeave}></MarkImg>
+                    </>
+                )
             }
-            update_box = (
+            return (
                 <>
-                    <img alt='top box' style={ top_update } src='static/33.jpg' onDrag={ onDragTop(bbox, pos, bbox_set) }></img>
-                    <img alt='bottom box' style={ bottom_update } src='static/33.jpg' onDrag={ onDragDown(bbox, pos, bbox_set) }></img>
+                    <div data-testid='bbox' style={ bbox_style }></div>
+                    { update_box }
                 </>
             )
         }
         return (
-            <>
-                <div data-testid='bbox' style={ bbox_style }></div>
-                { update_box }
-            </>
+            <></>
         )
     }
-    return (
-        <></>
-    )
-}
 
-const AnnotateImage = (props: AnnotateImageProp) => {
-    const { files, cur_file } = props;
-    const [pos, setPos] = useState({ top: 0, left: 0 })
-    const ref = useRef<HTMLElement>();
-    useEffect(() => {
-        if (ref.current) {
-            const bbox = (ref.current as HTMLImageElement).getBoundingClientRect();
-            setPos({ top: bbox.top, left: bbox.left });
-
-        }
-    }, [props])
     if (files !== undefined && files.length > 0 && cur_file !== undefined) {
         const file = files[cur_file];
         return (
@@ -220,10 +254,6 @@ const AnnotateImage = (props: AnnotateImageProp) => {
                     value={(props.cur_file || 0) + 1}
                 />
                 </Stack>
-                {/* <p style={{ fontWeight: 700 }}> 파일명 (filename) :&nbsp; 
-                    <input style={{ border: '2px solid #ced4da', padding: '1px 2px', borderRadius: '3px' }}
-                        type='text' value={file} onClick={onClickSearch(props)} onChange={(e) => { }}></input>
-                </p> */}
                 <div ref={ref as LegacyRef<HTMLDivElement>}
                     style={{
                         width: 512,
@@ -236,8 +266,8 @@ const AnnotateImage = (props: AnnotateImageProp) => {
                             onClick={ onClickHandle(props) }
                             onContextMenu={ onRightClickHandle(props) }></img>
                 </div>
-                { render_marks(props, pos) }
-                { render_bbox(props, pos) }
+                { render_marks(props, offset) }
+                { render_bbox() }
             </>
         )
     } else

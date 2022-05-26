@@ -1,4 +1,4 @@
-import React, { MouseEventHandler } from 'react';
+import React, { } from 'react';
 import { Button, Divider, FormControlLabel, Grid, IconButton, Radio, RadioGroup, Stack } from '@mui/material';
 import HighlightOffIcon from '@mui/icons-material/HighlightOff';
 import { connect, ConnectedProps } from 'react-redux';
@@ -24,12 +24,11 @@ interface LandmarkProps extends PropsFromRedux {
 
 }
 
-const onClickClear = ({ landmark_order_clear }: LandmarkProps, colorkey_order: number): MouseEventHandler<SVGElement> => (e) => {
-    landmark_order_clear(colorkey_order);
-}
-
 const Landmark = (props: LandmarkProps) => {
-    const { cloth_type, landmark_order, landmark_order_set } = props
+    const { cloth_type, landmark_order, landmark_order_set, landmark_order_clear } = props
+    const handleClickClear = (colorkey_order: number) => () => {
+        landmark_order_clear(colorkey_order);
+    }
     return (
         <>
             {/* { Children.toArray(legend) } */}
@@ -70,7 +69,8 @@ const Landmark = (props: LandmarkProps) => {
                     <Stack>
                     {mark_set[cloth_type!] && mark_set[cloth_type!].map((each, index) => { 
                         return (
-                            <IconButton key={index} aria-label="delete" size="small" sx={{ height: 36 }}>
+                            <IconButton key={index} aria-label="delete" size="small" sx={{ height: 36 }}
+                                onClick={handleClickClear(color_key.indexOf(color_set[each][0]))}>
                                 <HighlightOffIcon></HighlightOffIcon>
                             </IconButton>
                         )
