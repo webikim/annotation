@@ -27,3 +27,7 @@ export type Position = {
     top: number,
     left: number
 }
+
+export type JobStatus = {
+    [x: string]: number
+}

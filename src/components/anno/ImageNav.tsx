@@ -7,7 +7,7 @@ import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrow
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 
 import { file_prev, file_next } from '../../store/anno/dirDuck';
-import { cloth_save, cloth_delete, clear_status } from '../../store/anno/annoDuck';
+import { cloth_save, cloth_delete, clear_status, CLOTH_SAVE } from '../../store/anno/annoDuck';
 import { Cookies } from 'react-cookie';
 import { RootState } from '../../store/store';
 import { red } from '@mui/material/colors';
@@ -37,13 +37,13 @@ interface NavProps extends PropsFromRedux {
 const Nav = (props: NavProps) => {
     const { cloth_save, cloth_delete, file_next, file_prev, cookies } = props
     useEffect(() => {
-        if (props.save_result) {
-            if (props.save_result === 1) {
+        if (props.save_result && CLOTH_SAVE in props.save_result) {
+            if (props.save_result[CLOTH_SAVE] === 1) {
                 alert('저장되었습니다.');
                 props.clear_status();
                 if (props.auto_next)
                     props.file_next(props.cookies);
-            } else if (props.save_result === -1) {
+            } else if (props.save_result[CLOTH_SAVE] === -1) {
                 alert('정보를 모두 입력하세요!');
                 props.clear_status();
             }

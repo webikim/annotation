@@ -23,6 +23,10 @@ export const get_image_label = (filename: string) => (dispatch: AppDispatch, get
                     delete label['데이터셋 정보']['데이터셋 상세설명']['폴리곤좌표'];
                 dispatch(_get_image_label(response.data))
             }
+        ).catch(
+            (error) => {
+                dispatch(image_label_clear())
+            }
         )
     }
 }
