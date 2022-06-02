@@ -1,4 +1,4 @@
-import React, { Children, CSSProperties, DragEventHandler, LegacyRef, MouseEvent, MouseEventHandler, useEffect, useRef, useState } from 'react'
+import React, { Children, CSSProperties, LegacyRef, MouseEvent, MouseEventHandler, useEffect, useRef, useState } from 'react'
 import { connect, ConnectedProps } from 'react-redux'
 import { Stack, styled, TextField } from '@mui/material';
 
@@ -9,6 +9,7 @@ import { file_set } from '../../store/anno/dirDuck';
 import { RootState } from '../../store/store';
 import { Position } from '../../typings';
 import { Cookies } from 'react-cookie';
+import AlertDialog from '../util/AlertDialog';
 
 const mapStateToProps = (state: RootState) => ({
     bbox: state.anno.bbox,
@@ -100,7 +101,7 @@ const render_marks = (props: AnnotateImageProp, pos: Position) => {
         <></>
     )
 }
-
+    
 const onClickSearch = (props: AnnotateImageProp) => (e: MouseEvent<HTMLInputElement>) => {
     let value = prompt("검색할 파일을 입력하세요", (e.target as HTMLInputElement).value);
     if (value) {
@@ -127,9 +128,10 @@ const onClickValue = ({ files, file_set, cookies, cur_dir }: AnnotateImageProp):
     (e.target as HTMLInputElement).blur();
 }
 
-
 const AnnotateImage = (props: AnnotateImageProp) => {
     const { bbox, bbox_show, bbox_update, bbox_set, cur_file, files } = props;
+    // const [openDialog, setOpenDialog] = useState(false);
+    // const [dialog, setDialog] = useState({ type: 0, message: '', label: '' })
     const [offset, setOffset] = useState({ top: 0, left: 0})
     const [moved, setMoved] = useState({ top: 0, left: 0, bottom: 0, right: 0 })
     const ref = useRef<HTMLElement>();
@@ -229,47 +231,94 @@ const AnnotateImage = (props: AnnotateImageProp) => {
         )
     }
 
+    // const handleDialogClose = () => {
+    //     setOpenDialog(false)
+    // }
+    // 
+    // const handleClickFilename = () => {
+    //     setDialog({
+    //         type: 1,
+    //         message: '찾으시는 파일이름을 입력하세요.',
+    //         label: 'File name'
+    //     })
+    //     setOpenDialog(true)
+    // }
+    // 
+    // const handleClickFileno = () => {
+    //     setDialog({
+    //         type: 2,
+    //         message: '이동할 번호를 입력하세요:',
+    //         label: 'File no'
+    //     })
+    //     setOpenDialog(true)
+    // }
+
     if (files !== undefined && files.length > 0 && cur_file !== undefined) {
         const file = files[cur_file];
         return (
             <>
-                <Stack direction='row'>
-                <TextField
-                    margin="normal"
-                    size='small'
-                    name="filename"
-                    sx={{ width: 420 }}
-                    label="파일명 (filename)"
-                    id="filename"
-                    value={file}
-                />
-                <TextField
-                    margin="normal"
-                    size='small'
-                    name="filename"
-                    sx={{ width: 92 }}
-                    label="번호 (No.)"
-                    id="filename"
-                    inputProps={{min: 0, style: { textAlign: 'center' }}}
-                    value={(props.cur_file || 0) + 1}
-                />
+                <Stack direction="row">
+                    <TextField
+                        margin="normal"
+                        size="small"
+                        name="filename"
+                        sx={{ width: 420 }}
+                        label="파일명 (filename)"
+                        id="filename"
+                        value={file}
+                        // onClick={handleClickFilename}
+                    />
+                    <TextField
+                        margin="normal"
+                        size="small"
+                        name="filename"
+                        sx={{ width: 92 }}
+                        label="번호 (No.)"
+                        id="fileno"
+                        inputProps={{ min: 0, style: { textAlign: "center" } }}
+                        value={(props.cur_file || 0) + 1}
+                        // onClick={handleClickFileno}
+                    />
                 </Stack>
-                <div ref={ref as LegacyRef<HTMLDivElement>}
+                <div
+                    ref={ref as LegacyRef<HTMLDivElement>}
                     style={{
                         width: 512,
                         height: 512,
-                        backgroundColor: 'white',
-                        border: '1px solid lightgrey'
-                    }} >
-                    <img alt='annotation target' draggable='false'
-                        src={API_IMG_GET + '?' + encodeQueryData({ 'path': '' + props.cur_dir, 'name': '' + file })}
-                            onClick={ onClickHandle(props) }
-                            onContextMenu={ onRightClickHandle(props) }></img>
+                        backgroundColor: "white",
+                        border: "1px solid lightgrey",
+                    }}
+                >
+                    <img
+                        alt="annotation target"
+                        draggable="false"
+                        src={
+                            API_IMG_GET +
+                            "?" +
+                            encodeQueryData({ path: "" + props.cur_dir, name: "" + file })
+                        }
+                        onClick={onClickHandle(props)}
+                        onContextMenu={onRightClickHandle(props)}
+                    ></img>
                 </div>
-                { render_marks(props, offset) }
-                { render_bbox() }
+                {render_marks(props, offset)}
+                {render_bbox()}
+                {/* <AlertDialog
+                    open={openDialog}
+                    onClose={handleDialogClose}
+                    message={dialog.message}
+                >
+                    <TextField
+                        autoFocus
+                        margin='dense'
+                        id='filename'
+                        label={dialog.label}
+                        fullWidth
+                        variant='standard'
+                    />
+                </AlertDialog> */}
             </>
-        )
+        );
     } else
         return <></>
 }

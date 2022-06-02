@@ -1,7 +1,8 @@
 import { Reducer } from "redux";
 import { ajaxBase, DELETE, encodeQueryData, GET, POST } from "../../common/ajax";
 import { API_ANNO_DELETE, API_ANNO_GET, API_ANNO_SAVE } from "../../common/urls";
-import { BBoxType, CollectLandmarkType, JobStatus, LabelType } from "../../typings";
+import { BBoxType, CollectLandmarkType, LabelType } from "../../typings";
+import { status_set } from "../comDuck";
 import { AppDispatch, GetState } from "../store";
 
 export const mark_set: { [k: string]: string[] } = {
@@ -93,8 +94,6 @@ export const BBOX_UPDATE_SET = 'bbox/update/set' as const;
 export const CLOTH_GET = 'cloth/get' as const;
 export const CLOTH_SAVE = 'cloth/save' as const;
 export const CLOTH_DELETE = 'cloth/delete' as const;
-export const JOB_STATUS = 'job/status' as const;
-export const CLEAR_STATUS = 'job/clear' as const;
 
 // action
 export const cloth_type_set = (cloth_type: string) => (dispatch: AppDispatch, getState: GetState) => {
@@ -273,11 +272,11 @@ export const cloth_save = () => (dispatch: AppDispatch, getState: GetState) => {
                 marks: filter_marks({ ...anno }, anno.cloth_type),
             },
         }).then(
-            (response) => dispatch(job_status(CLOTH_SAVE, 1))
+            (response) => dispatch(status_set(CLOTH_SAVE, 1))
         ).catch(
-            (error) => dispatch(job_status(CLOTH_SAVE, -1))
+            (error) => dispatch(status_set(CLOTH_SAVE, -1))
         );
-    } else dispatch(job_status(CLOTH_SAVE, -1));
+    } else dispatch(status_set(CLOTH_SAVE, -1));
 }
 
 export const cloth_delete = () => (dispatch: AppDispatch, getState: GetState) => {
@@ -289,25 +288,13 @@ export const cloth_delete = () => (dispatch: AppDispatch, getState: GetState) =>
         }).then(
             () => {
                 dispatch(_cloth_get({}))
-                dispatch(job_status(CLOTH_DELETE, 1))
+                dispatch(status_set(CLOTH_DELETE, 1))
             }
         ).catch(
-            (error) => dispatch(job_status(CLOTH_DELETE, -1))
+            (error) => dispatch(status_set(CLOTH_DELETE, -1))
         )
     }
 }
-
-export const job_status = (job_name: string, status: number) => ({
-    type: JOB_STATUS,
-    payload: {
-        [job_name]: status
-    }
-})
-
-export const clear_status = () => ({
-    type: CLEAR_STATUS,
-    payload: {}
-})
 
 type AnnoAction = ReturnType<typeof _cloth_type_set>
     | ReturnType<typeof _landmark_order_set>
@@ -320,8 +307,6 @@ type AnnoAction = ReturnType<typeof _cloth_type_set>
     | ReturnType<typeof bbox_show_set>
     | ReturnType<typeof bbox_update_set>
     | ReturnType<typeof _cloth_get>
-    | ReturnType<typeof job_status>
-    | ReturnType<typeof clear_status>
 
 type AnnoState = {
     cloth_type?: string,
@@ -331,7 +316,6 @@ type AnnoState = {
     bbox?: BBoxType,
     bbox_show?: number,
     bbox_update?: number,
-    status?: JobStatus,
     auto_next?: number
 }
 
@@ -393,20 +377,6 @@ const reducer: Reducer<AnnoState, AnnoAction> = (state: AnnoState = INITIAL_STAT
             return {
                 ...state,
                 bbox_update: action.payload
-            } as AnnoState
-        case JOB_STATUS:
-            console.log('.... job status', action.payload)
-            return {
-                ...state,
-                status: {
-                    ...state.status,
-                    ...action.payload
-                }
-            } as AnnoState
-        case CLEAR_STATUS:
-            return {
-                ...state,
-                status: action.payload
             } as AnnoState
         default:
             return state;

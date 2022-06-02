@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useState } from 'react'
 import { connect, ConnectedProps } from 'react-redux';
 
 import { Button, IconButton, Stack } from '@mui/material';
@@ -6,25 +6,28 @@ import { Button, IconButton, Stack } from '@mui/material';
 import KeyboardDoubleArrowLeftIcon from '@mui/icons-material/KeyboardDoubleArrowLeft';
 import KeyboardDoubleArrowRightIcon from '@mui/icons-material/KeyboardDoubleArrowRight';
 
+import { cloth_save, cloth_delete, CLOTH_SAVE } from '../../store/anno/annoDuck';
+import { status_reset } from '../../store/comDuck';
 import { file_prev, file_next } from '../../store/anno/dirDuck';
-import { cloth_save, cloth_delete, clear_status, CLOTH_SAVE } from '../../store/anno/annoDuck';
 import { Cookies } from 'react-cookie';
 import { RootState } from '../../store/store';
 import { red } from '@mui/material/colors';
+import AlertBar from '../util/AlertBar';
+import AlertDialog from '../util/AlertDialog';
 
 const mapStateToProps = (state: RootState) => ({
     files: state.dir.files,
-    save_result: state.anno.status,
+    status: state.com.status,
     cur_file: state.dir.cur_file,
     auto_next: state.image.auto_next
 })
 
 const mapDispatchToProps = {
-    clear_status,
     cloth_save,
     cloth_delete,
     file_prev,
-    file_next
+    file_next,
+    status_reset
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps);
@@ -35,22 +38,35 @@ interface NavProps extends PropsFromRedux {
 }
 
 const Nav = (props: NavProps) => {
-    const { cloth_save, cloth_delete, file_next, file_prev, cookies } = props
-    useEffect(() => {
-        if (props.save_result && CLOTH_SAVE in props.save_result) {
-            if (props.save_result[CLOTH_SAVE] === 1) {
-                alert('저장되었습니다.');
-                props.clear_status();
-                if (props.auto_next)
-                    props.file_next(props.cookies);
-            } else if (props.save_result[CLOTH_SAVE] === -1) {
-                alert('정보를 모두 입력하세요!');
-                props.clear_status();
-            }
+    const { cloth_save, cloth_delete, file_next, file_prev, status_reset, cookies, files, status } = props
+    const [openAlert, setOpenAlert] = useState(false);
+    const [openDialog, setOpenDialog] = useState(false);
+    const [message, setMessage] = useState('');
+
+    if (!openAlert && status[CLOTH_SAVE]) {
+        if (status[CLOTH_SAVE] === 1)
+            setMessage('저장되었습니다.')
+        else
+            setMessage('저장되지 않았습니다. 정보를 모두 입력하세요!.')
+        setOpenAlert(true);
+    }
+
+    const handleAlertClose = () => {
+        setOpenAlert(false);
+        if (status[CLOTH_SAVE]) {
+            status_reset(CLOTH_SAVE);
+            if (status[CLOTH_SAVE] === 1 && props.auto_next)
+                file_next(cookies);
         }
-    }, [props, props.save_result])
+    }
+
+    const handleDelete = (answer: boolean) => {
+        setOpenDialog(false);
+        if (answer)
+            cloth_delete();
+    }
     
-    if (props.files) {
+    if (files) {
         return (
             <>
                 <Stack direction='row' width='100%' spacing={2} justifyContent='space-evenly'>
@@ -60,20 +76,14 @@ const Nav = (props: NavProps) => {
                     <Button variant="contained" sx={{ width: 100 }} onClick={(evt) => { cloth_save()}}>Save</Button>
                     <Button variant="contained" sx={{ width: 100, backgroundColor: red['A700'] }}
                         onClick={(evt) => {
-                            if (window.confirm('삭제하시겠습니까?')) {
-                                cloth_delete();
-                            }
+                            setOpenDialog(true);
                         }}>Delete</Button>
                     <IconButton aria-label="right" size="small" sx={{ height: 36 }} onClick={(evt) => { file_next(cookies) }}>
                         <KeyboardDoubleArrowRightIcon></KeyboardDoubleArrowRightIcon>
                     </IconButton>
                 </Stack>
-                {/* <Row>
-                    <Col>
-                        <input style={{ width: '80px', border: '2px solid #ced4da', padding: '1px 2px', borderRadius: '3px' }} type='text' value={ (props.cur_file || 0) + 1 } onClick={ onClickValue(props) } onChange={ (e) => { } }/>
-                        <span>/({ (props.files || []).length })</span>
-                    </Col>
-                </Row> */}
+                <AlertBar open={openAlert} onClose={handleAlertClose} message={message}></AlertBar>
+                <AlertDialog open={openDialog} onClose={handleDelete} message='삭제하시겠습니까?'></AlertDialog>
             </>
         )
     } else
@@ -81,6 +91,5 @@ const Nav = (props: NavProps) => {
             <></>
         )
 }
-
 
 export default connector(Nav)

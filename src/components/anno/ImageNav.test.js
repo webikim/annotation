@@ -9,7 +9,7 @@ const initialstate = {
     dir: {
         files: []
     },
-    anno: {
+    com: {
         status: 0
     },
     image: {
